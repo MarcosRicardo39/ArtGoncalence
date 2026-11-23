@@ -1,7 +1,7 @@
 # Plano de implementação — ArtGoncalense
 
 ## 1. Regras de execução
-**Estado: T01 a T03 concluídas. T04 a T20 pendentes.** Executar somente tarefas autorizadas; marcar concluída apenas após evidência. Não fazer deploy ou criar recursos externos por conta própria. Referências: requirements.md, architecture.md e specifications.md.
+**Estado: T01 a T04 concluídas. T05 a T20 pendentes.** Executar somente tarefas autorizadas; marcar concluída apenas após evidência. Não fazer deploy ou criar recursos externos por conta própria. Referências: requirements.md, architecture.md e specifications.md.
 
 | ID | Tarefa | Dependências | Critério de conclusão |
 |---|---|---|---|
@@ -32,3 +32,4 @@ Ao concluir cada tarefa, anotar data, arquivos alterados, testes executados, res
 - **2026-11-23 — T01.** Aprovação registrada em [decisions.md](decisions.md). Nome atualizado nos oito documentos e contrato de cadastro alinhado à resposta uniforme. Revisão documental das DA-01 a DA-07. Build e testes de software não se aplicam.
 - **2026-11-23 — T02.** Git local inicializado. Solução .NET com API, Domain, Application, Infrastructure e projeto xUnit. Frontend Angular com lockfile, README e regras de ignore. SDK .NET 10.0.404, Angular 22.3.0, Node.js 24.21.0 e npm 11.19.0. Build .NET sem avisos e build Angular aprovados. A API respondeu ao `GET /openapi/v1.json` local. Dois testes Angular passaram. `dotnet test` executado com zero casos xUnit, previstos a partir da T03. Auditorias NuGet (incluindo transitivas) e npm sem vulnerabilidades conhecidas nas fontes consultadas.
 - **2026-11-23 — T03.** Criados os modelos de usuário, link de apoio, ilustração, denúncia e ação de moderação, com enums e invariantes locais. Build .NET com zero avisos e erros. `dotnet test backend/ArtGoncalense.sln --no-build` aprovou 14 casos. A revisão confirmou estado inicial pendente para ilustrações, rejeição de identificadores de vínculo vazios e exigência de autoria e justificativa na ação de moderação. Autorização e políticas de publicação serão verificadas nas suas etapas.
+- **2026-11-23 — T04.** Configurados EF Core 10.0.15, Npgsql 10.0.4, contexto, mapeamentos, configuração por ambiente e migration `20261123205443_ModeloInicial`. Build .NET com zero avisos e erros. 15 testes passaram com PostgreSQL 18.7 descartável em loopback. O teste aplicou a migration e verificou gravação e leitura das cinco entidades, UTC, integridade referencial e unicidade do e-mail armazenado. O comando explícito de atualização confirmou a migration aplicada, o modelo não apresentou mudanças pendentes e a auditoria NuGet não apontou vulnerabilidades conhecidas. T05 depende da escolha de sessão da DA-03 e dos limites de requisição da DA-05.

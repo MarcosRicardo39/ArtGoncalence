@@ -33,4 +33,19 @@ npm run build
 npm test -- --watch=false
 ```
 
-Os testes xUnit verificam as invariantes do modelo de domínio. A aplicação funciona localmente sem PostgreSQL, armazenamento de imagens ou provedor de e-mail nesta etapa.
+Os testes xUnit verificam as invariantes do domínio. O teste de integração usa um banco PostgreSQL descartável quando `ARTGONCALENSE_TEST_POSTGRES` está definida.
+
+## PostgreSQL local
+
+Crie um banco local vazio para desenvolvimento e outro dedicado a testes. Configure cada conexão na sessão do PowerShell usando as credenciais locais. Execute os comandos a partir da raiz.
+
+```powershell
+$env:ConnectionStrings__ArtGoncalense = Read-Host 'Conexão PostgreSQL de desenvolvimento' -MaskInput
+dotnet tool restore
+dotnet ef database update --project backend/src/ArtGoncalense.Infrastructure --startup-project backend/src/ArtGoncalense.API
+
+$env:ARTGONCALENSE_TEST_POSTGRES = Read-Host 'Conexão PostgreSQL do banco descartável de teste' -MaskInput
+dotnet test backend/ArtGoncalense.sln
+```
+
+O teste aplica a migration no banco indicado e desfaz os dados de teste ao encerrar a transação. A API aplica migrations somente pelo comando explícito acima.

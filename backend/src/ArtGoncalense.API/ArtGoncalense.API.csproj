@@ -15,4 +15,8 @@
     <ProjectReference Include="..\ArtGoncalense.Infrastructure\ArtGoncalense.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.15" PrivateAssets="all" />
+  </ItemGroup>
+
 </Project>

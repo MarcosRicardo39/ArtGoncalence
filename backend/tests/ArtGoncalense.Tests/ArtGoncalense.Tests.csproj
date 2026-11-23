@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ArtGoncalense.Domain\ArtGoncalense.Domain.csproj" />
+    <ProjectReference Include="..\..\src\ArtGoncalense.Infrastructure\ArtGoncalense.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
