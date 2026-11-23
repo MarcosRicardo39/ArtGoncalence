@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using ArtGoncalense.Application.Contas;
+using ArtGoncalense.Domain;
 using ArtGoncalense.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -121,6 +122,74 @@ public sealed class ContasTests
         Assert.Equal(HttpStatusCode.Accepted, (await PostAsync(cliente, "solicitar-recuperacao", new { email })).StatusCode);
     }
 
+    [PostgreSqlFact]
+    public async Task PerfilPublicoOmiteDadosPrivadosEEdicaoFicaRestritaAoTitular()
+    {
+        using var aplicacao = new Aplicacao();
+        using var visitante = await aplicacao.CriarClienteAsync();
+        using var primeiro = await aplicacao.CriarClienteAsync();
+        using var segundo = await aplicacao.CriarClienteAsync();
+        const string rota = "/api/artistas/me";
+
+        var primeiroId = await CadastrarArtistaAsync(primeiro, "Primeiro artista");
+        var segundoId = await CadastrarArtistaAsync(segundo, "Segundo artista");
+        var outroPerfil = $"/api/artistas/{segundoId}";
+        var dados = new { nomePublico = "  Nome atualizado  ", bio = "  Biografia pública  " };
+
+        Assert.Equal(HttpStatusCode.Unauthorized, (await visitante.PutAsJsonAsync(rota, dados)).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await primeiro.PutAsJsonAsync(rota, dados)).StatusCode);
+        Assert.Equal(HttpStatusCode.MethodNotAllowed,
+            (await EnviarComCsrfAsync(primeiro, HttpMethod.Put, outroPerfil, dados)).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await EnviarComCsrfAsync(primeiro, HttpMethod.Put, rota,
+            new { id = segundoId, dados.nomePublico, dados.bio })).StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, (await EnviarComCsrfAsync(primeiro, HttpMethod.Put, rota,
+            new { nomePublico = " ", bio = new string('x', 2001) })).StatusCode);
+
+        Assert.Equal(HttpStatusCode.NoContent,
+            (await EnviarComCsrfAsync(primeiro, HttpMethod.Put, rota, dados)).StatusCode);
+        using var resposta = await visitante.GetAsync($"/api/artistas/{primeiroId}");
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+        using var perfil = JsonDocument.Parse(await resposta.Content.ReadAsStringAsync());
+        var publico = perfil.RootElement;
+        Assert.Equal(new[] { "bio", "id", "nomePublico" },
+            publico.EnumerateObject().Select(campo => campo.Name).Order().ToArray());
+        Assert.Equal(primeiroId, publico.GetProperty("id").GetGuid());
+        Assert.Equal("Nome atualizado", publico.GetProperty("nomePublico").GetString());
+        Assert.Equal("Biografia pública", publico.GetProperty("bio").GetString());
+
+        using var respostaSegundo = await visitante.GetAsync(outroPerfil);
+        Assert.Equal(HttpStatusCode.OK, respostaSegundo.StatusCode);
+        using var perfilSegundo = JsonDocument.Parse(await respostaSegundo.Content.ReadAsStringAsync());
+        Assert.Equal("Segundo artista", perfilSegundo.RootElement.GetProperty("nomePublico").GetString());
+
+        Assert.Equal(HttpStatusCode.NoContent, (await EnviarComCsrfAsync(primeiro, HttpMethod.Put, rota,
+            new { nomePublico = "Nome atualizado", bio = (string?)null })).StatusCode);
+        using var semBio = await visitante.GetFromJsonAsync<JsonDocument>($"/api/artistas/{primeiroId}");
+        Assert.Equal(JsonValueKind.Null, semBio!.RootElement.GetProperty("bio").ValueKind);
+        Assert.Equal(HttpStatusCode.NotFound, (await visitante.GetAsync($"/api/artistas/{Guid.NewGuid()}")).StatusCode);
+
+        await using var scope = aplicacao.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<ArtGoncalenseDbContext>();
+        var suspenso = new Usuario(Guid.NewGuid(), $"{Guid.NewGuid():N}@example.test", "Artista suspenso",
+            PapelUsuario.Artista, StatusUsuario.Suspenso, DateTimeOffset.UtcNow);
+        db.Usuarios.Add(suspenso);
+        await db.SaveChangesAsync();
+        Assert.Equal(HttpStatusCode.NotFound, (await visitante.GetAsync($"/api/artistas/{suspenso.Id}")).StatusCode);
+    }
+
+    private static async Task<Guid> CadastrarArtistaAsync(HttpClient cliente, string nomePublico)
+    {
+        await ObterCsrfAsync(cliente);
+        var email = $"{Guid.NewGuid():N}@example.test";
+        Assert.Equal(HttpStatusCode.Accepted,
+            (await PostAsync(cliente, "registrar", new { email, senha = Senha, nomePublico })).StatusCode);
+        Assert.Equal(HttpStatusCode.OK,
+            (await PostAsync(cliente, "login", new { email, senha = Senha })).StatusCode);
+        await ObterCsrfAsync(cliente);
+        using var sessao = await cliente.GetFromJsonAsync<JsonDocument>("/api/contas/sessao");
+        return sessao!.RootElement.GetProperty("id").GetGuid();
+    }
+
     private static async Task ObterCsrfAsync(HttpClient cliente)
     {
         using var resposta = await cliente.GetAsync("/api/contas/csrf");
@@ -133,9 +202,13 @@ public sealed class ContasTests
 
     private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<HttpClient, string> TokensCsrf = new();
 
-    private static async Task<HttpResponseMessage> PostAsync(HttpClient cliente, string rota, object dados)
+    private static Task<HttpResponseMessage> PostAsync(HttpClient cliente, string rota, object dados) =>
+        EnviarComCsrfAsync(cliente, HttpMethod.Post, $"/api/contas/{rota}", dados);
+
+    private static async Task<HttpResponseMessage> EnviarComCsrfAsync(
+        HttpClient cliente, HttpMethod metodo, string rota, object dados)
     {
-        using var pedido = new HttpRequestMessage(HttpMethod.Post, $"/api/contas/{rota}")
+        using var pedido = new HttpRequestMessage(metodo, rota)
         {
             Content = JsonContent.Create(dados)
         };

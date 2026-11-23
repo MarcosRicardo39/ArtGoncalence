@@ -1,4 +1,5 @@
 using ArtGoncalense.API.Contas;
+using ArtGoncalense.Application.Artistas;
 using ArtGoncalense.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 builder.Services.AddProblemDetails();
 builder.AdicionarContas();
+builder.Services.AddScoped<ServicoPerfis>();
+builder.Services.AddScoped<IRepositorioPerfis, RepositorioPerfis>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ArtGoncalenseDbContext>((services, options) =>

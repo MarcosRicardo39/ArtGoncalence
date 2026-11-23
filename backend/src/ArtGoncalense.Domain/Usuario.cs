@@ -30,12 +30,19 @@ public sealed class Usuario
 
     public Guid Id { get; }
     public string Email { get; }
-    public string NomePublico { get; }
-    public string? Bio { get; }
+    public string NomePublico { get; private set; }
+    public string? Bio { get; private set; }
     public string? AvatarPath { get; }
     public PapelUsuario Papel { get; }
     public StatusUsuario Status { get; private set; }
     public DateTimeOffset CriadoEm { get; }
+
+    public void EditarPerfil(string nomePublico, string? bio)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(nomePublico);
+        NomePublico = nomePublico.Trim();
+        Bio = string.IsNullOrWhiteSpace(bio) ? null : bio.Trim();
+    }
 
     public void ConfirmarEmail()
     {
