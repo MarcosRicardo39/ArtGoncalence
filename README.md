@@ -48,4 +48,10 @@ $env:ARTGONCALENSE_TEST_POSTGRES = Read-Host 'Conexão PostgreSQL do banco desca
 dotnet test backend/ArtGoncalense.sln
 ```
 
-O teste aplica a migration no banco indicado e desfaz os dados de teste ao encerrar a transação. A API aplica migrations somente pelo comando explícito acima.
+Os testes aplicam migrations no banco indicado. Use um banco descartável, pois os testes HTTP de conta criam registros fictícios. Para o banco de desenvolvimento, aplique as migrations com o comando explícito acima.
+
+## Autenticação local
+
+Execute a API no perfil HTTPS de desenvolvimento. Antes de iniciá-la, configure `$env:Contas__DiretorioEmailLocal = Join-Path ([System.IO.Path]::GetTempPath()) 'artgoncalense-email'`. O diretório deve ser privado e fora do repositório. Os arquivos JSON contêm códigos temporários e devem ser tratados como credenciais. Use somente endereços fictícios e remova os arquivos ao encerrar os testes manuais.
+
+Os fluxos e os cabeçalhos estão na [documentação da API](Docs/api-documentation.md). Os limites de autenticação podem ser ajustados por variáveis `Contas__Limites__LoginPorIp`, `Contas__Limites__CorreioPorIp`, `Contas__Limites__EnviosPorEmail` e `Contas__Limites__FalhasPorConta`.

@@ -1,7 +1,7 @@
 # Especificações — ArtGoncalense
 
 ## 1. Referências e estado
-Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). Contratos abaixo são **propostos**, não implementados. JSON em português e erros no formato Problem Details. Detalhes de autenticação e envio de e-mail dependem de decisões pendentes.
+Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). As rotas de contas da T05 estão implementadas; as demais seguem propostas. JSON em português e erros no formato Problem Details. O provedor de e-mail para ambiente público depende da DA-05.
 
 ## 2. Fluxo de cadastro
 1. Visitante informa e-mail, senha e nome público.
@@ -22,7 +22,14 @@ Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). C
 | Método | Rota | Acesso | Resultado principal |
 |---|---|---|---|
 | POST | `/api/contas/registrar` | Público | 202 para solicitação válida, inclusive para e-mail já cadastrado |
-| POST | `/api/contas/login` | Público | 200 com sessão/token conforme DA-03 |
+| POST | `/api/contas/login` | Público | 200 com cookie de sessão conforme DA-03 |
+| GET | `/api/contas/csrf` | Público | 204 com cookies de proteção CSRF |
+| GET | `/api/contas/sessao` | Usuário autenticado | 200 com `id` e `emailConfirmado`, ou 401 |
+| POST | `/api/contas/sair` | Usuário autenticado | 204 |
+| POST | `/api/contas/confirmar-email` | Público | 204 ou 400 genérico para código inválido ou expirado |
+| POST | `/api/contas/reenviar-confirmacao` | Público | 202 genérico para solicitação válida |
+| POST | `/api/contas/solicitar-recuperacao` | Público | 202 genérico para solicitação válida |
+| POST | `/api/contas/redefinir-senha` | Público | 204 ou 400 genérico para código inválido ou expirado |
 | GET | `/api/artistas/{id}` | Público | 200 ou 404 |
 | PUT | `/api/artistas/me` | Artista | 200/204 |
 | GET | `/api/ilustracoes?page=1&pageSize=20` | Público | 200, apenas aprovadas |

@@ -22,5 +22,7 @@
 9. Testar registro, confirmação de e-mail, publicação, moderação, exclusão e link de apoio em ambiente de teste.
 10. Se o plano gratuito não for adequado, suspender a publicação e apresentar alternativas; nunca migrar automaticamente para pago.
 
+Para a sessão da T05, validar o acesso do navegador ao frontend e a `/api` pela mesma origem HTTPS. Preservar o IP do cliente somente por meio de proxies confiáveis e proteger as chaves de Data Protection usadas pelos cookies e códigos. Os limites por IP e por endereço de e-mail operam na memória de cada instância. Validar o comportamento após reinícios e entre instâncias antes da abertura pública.
+
 ## CI/CD planejado
 GitHub Actions: restore, build, testes e geração de artefatos; deploy somente após autorização e configuração segura de credenciais. Não inferir que o projeto anterior DocumentAI autoriza publicação deste novo projeto.

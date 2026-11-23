@@ -1,10 +1,13 @@
 using ArtGoncalense.Domain;
+using ArtGoncalense.Infrastructure.Identidade;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ArtGoncalense.Infrastructure.Persistence;
 
-public sealed class ArtGoncalenseDbContext(DbContextOptions<ArtGoncalenseDbContext> options) : DbContext(options)
+public sealed class ArtGoncalenseDbContext(DbContextOptions<ArtGoncalenseDbContext> options)
+    : IdentityUserContext<ContaIdentity, Guid>(options)
 {
     public DbSet<Usuario> Usuarios => Set<Usuario>();
     public DbSet<LinkApoio> LinksApoio => Set<LinkApoio>();
@@ -19,6 +22,8 @@ public sealed class ArtGoncalenseDbContext(DbContextOptions<ArtGoncalenseDbConte
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         var usuario = modelBuilder.Entity<Usuario>();
         usuario.HasKey(x => x.Id);
         usuario.Property(x => x.Id).ValueGeneratedNever();
@@ -30,6 +35,14 @@ public sealed class ArtGoncalenseDbContext(DbContextOptions<ArtGoncalenseDbConte
         usuario.Property(x => x.Status);
         usuario.Property(x => x.CriadoEm);
         usuario.HasIndex(x => x.Email).IsUnique();
+
+        var conta = modelBuilder.Entity<ContaIdentity>();
+        conta.Property(x => x.Id).ValueGeneratedNever();
+        conta.Property(x => x.Email).IsRequired();
+        conta.Property(x => x.NormalizedEmail).IsRequired();
+        conta.HasIndex(x => x.NormalizedEmail).IsUnique().HasDatabaseName("EmailIndex");
+        conta.HasOne<Usuario>().WithOne().HasForeignKey<ContaIdentity>(x => x.Id)
+            .OnDelete(DeleteBehavior.Restrict);
 
         var linkApoio = modelBuilder.Entity<LinkApoio>();
         linkApoio.HasKey(x => x.Id);

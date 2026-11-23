@@ -34,6 +34,14 @@ public sealed class Usuario
     public string? Bio { get; }
     public string? AvatarPath { get; }
     public PapelUsuario Papel { get; }
-    public StatusUsuario Status { get; }
+    public StatusUsuario Status { get; private set; }
     public DateTimeOffset CriadoEm { get; }
+
+    public void ConfirmarEmail()
+    {
+        if (Status == StatusUsuario.PendenteConfirmacao)
+        {
+            Status = StatusUsuario.Ativo;
+        }
+    }
 }

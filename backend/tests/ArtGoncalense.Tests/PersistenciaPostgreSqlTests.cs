@@ -5,6 +5,7 @@ using Npgsql;
 
 namespace ArtGoncalense.Tests;
 
+[Collection("PostgreSQL local")]
 public sealed class PersistenciaPostgreSqlTests
 {
     [PostgreSqlFact]
@@ -55,16 +56,17 @@ public sealed class PersistenciaPostgreSqlTests
         Assert.Equal(PostgresErrorCodes.UniqueViolation, Assert.IsType<PostgresException>(emailError.InnerException).SqlState);
     }
 
-    private sealed class PostgreSqlFactAttribute : FactAttribute
-    {
-        public const string ConnectionVariable = "ARTGONCALENSE_TEST_POSTGRES";
+}
 
-        public PostgreSqlFactAttribute()
+internal sealed class PostgreSqlFactAttribute : FactAttribute
+{
+    public const string ConnectionVariable = "ARTGONCALENSE_TEST_POSTGRES";
+
+    public PostgreSqlFactAttribute()
+    {
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(ConnectionVariable)))
         {
-            if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(ConnectionVariable)))
-            {
-                Skip = $"Configure {ConnectionVariable} para executar o teste PostgreSQL.";
-            }
+            Skip = $"Configure {ConnectionVariable} para executar o teste PostgreSQL.";
         }
     }
 }
