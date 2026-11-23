@@ -32,7 +32,7 @@ ArtGoncalense/
 - Persistência: PostgreSQL via EF Core e migrations versionadas.
 - Imagens: Supabase Storage ou serviço compatível; arquivos fora do banco; banco guarda metadados e caminho.
 - Apoio: URL externa cadastrada e validada; nenhuma transação financeira intermediada.
-- Moderação: publicação com estado Pendente/Aprovada/Rejeitada/Oculta.
+- Moderação: publicação com estado Pendente/Aprovada/Rejeitada/Oculta. O estado e a auditoria da decisão são gravados na mesma transação. A atualização condicionada ao estado anterior evita sobrescrever decisões concorrentes.
 - E-mail: serviço externo para verificação, com modo local de desenvolvimento.
 
 ## 5. Modelo inicial

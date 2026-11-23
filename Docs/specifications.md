@@ -1,7 +1,7 @@
 # Especificações — ArtGoncalense
 
 ## 1. Referências e estado
-Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). As rotas de contas, perfis de artista e criação de ilustração estão implementadas. As demais seguem propostas. JSON em português e erros no formato Problem Details. O provedor de e-mail para ambiente público depende da DA-05.
+Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). As rotas de contas, perfis, criação de ilustração e moderação estão implementadas. As demais seguem propostas. JSON em português e erros no formato Problem Details. O provedor de e-mail para ambiente público depende da DA-05.
 
 ## 2. Fluxo de cadastro
 1. Visitante informa e-mail, senha e nome público.
@@ -15,7 +15,7 @@ Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). A
 2. API usa o artista confirmado da sessão e valida o limite de cinco publicações pendentes ou aprovadas, além do tipo e tamanho real da imagem.
 3. Arquivo é processado/otimizado, validado e enviado a armazenamento persistente.
 4. Registro é salvo com status `PENDENTE`.
-5. Moderador decide `APROVADA` ou `REJEITADA`, com justificativa.
+5. Moderador ou administrador aprova ou rejeita uma publicação pendente. Uma publicação aprovada pode ser ocultada. Cada decisão exige justificativa e registra autor, data e ação.
 6. Apenas `APROVADA` aparece na galeria pública. `OCULTA` não aparece.
 
 ## 4. Contratos HTTP propostos
@@ -37,8 +37,9 @@ Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). A
 | POST | `/api/ilustracoes` | Artista confirmado | 201 com status PENDENTE |
 | DELETE | `/api/ilustracoes/{id}` | Titular ou moderador | 204 |
 | POST | `/api/ilustracoes/{id}/denuncias` | Público, com antiabuso | 202 |
-| GET | `/api/moderacao/pendentes` | Moderador | 200 |
-| POST | `/api/moderacao/{id}/decisao` | Moderador | 200/204 |
+| GET | `/api/moderacao/pendentes` | Moderador ou administrador | 200 com fila paginada |
+| GET | `/api/moderacao/{id}/imagem` | Moderador ou administrador | 200 com WebP privado de ilustração pendente ou aprovada, ou 404 |
+| POST | `/api/moderacao/{id}/decisao` | Moderador ou administrador, com CSRF | 204 em caso de sucesso, 409 se o estado não permitir a decisão |
 | GET | `/health` | Operacional | 200/503 |
 
 ## 5. Validação e erros

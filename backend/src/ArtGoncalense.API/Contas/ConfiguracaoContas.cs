@@ -1,5 +1,6 @@
 using System.Threading.RateLimiting;
 using ArtGoncalense.Application.Contas;
+using ArtGoncalense.Domain;
 using ArtGoncalense.Infrastructure.Identidade;
 using ArtGoncalense.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
@@ -70,9 +71,12 @@ internal static class ConfiguracaoContas
                 }
             };
         });
-        services.AddAuthorizationBuilder().AddPolicy(AcessoConta.PublicarIlustracao, policy => policy
-            .RequireAuthenticatedUser().RequireRole(AcessoConta.PapelArtista)
-            .RequireClaim(AcessoConta.EmailConfirmado, bool.TrueString));
+        services.AddAuthorizationBuilder()
+            .AddPolicy(AcessoConta.PublicarIlustracao, policy => policy
+                .RequireAuthenticatedUser().RequireRole(AcessoConta.PapelArtista)
+                .RequireClaim(AcessoConta.EmailConfirmado, bool.TrueString))
+            .AddPolicy(AcessoConta.ModerarIlustracao, policy => policy
+                .RequireAuthenticatedUser().RequireRole(nameof(PapelUsuario.Moderador), nameof(PapelUsuario.Admin)));
         services.AddAntiforgery(options =>
         {
             options.HeaderName = "X-XSRF-TOKEN";

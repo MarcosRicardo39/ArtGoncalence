@@ -3,6 +3,7 @@ using ArtGoncalense.API.Ilustracoes;
 using ArtGoncalense.Application.Artistas;
 using ArtGoncalense.Application.Ilustracoes;
 using ArtGoncalense.Application.Imagens;
+using ArtGoncalense.Application.Moderacao;
 using ArtGoncalense.Infrastructure.Imagens;
 using ArtGoncalense.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,8 @@ builder.Services.AddScoped<ServicoPerfis>();
 builder.Services.AddScoped<IRepositorioPerfis, RepositorioPerfis>();
 builder.Services.AddScoped<ServicoPublicacao>();
 builder.Services.AddScoped<IRepositorioPublicacoes, RepositorioPublicacoes>();
+builder.Services.AddScoped<ServicoModeracao>();
+builder.Services.AddScoped<IRepositorioModeracao, RepositorioModeracao>();
 builder.Services.AddRateLimiter(options => options.AddConcurrencyLimiter(
     IlustracoesController.PoliticaConcorrenciaUpload, limiter =>
     {

@@ -1,7 +1,7 @@
 # Documentação da API — ArtGoncalense
 
 ## Estado
-As rotas de contas, perfis de artista e criação de ilustração estão implementadas. Os demais caminhos de [specifications.md](specifications.md) são contratos propostos.
+As rotas de contas, perfis, criação de ilustração e moderação estão implementadas. Os demais caminhos de [specifications.md](specifications.md) são contratos propostos.
 
 ## Convenções
 - Base: `/api` para recursos de negócio; `/health` para saúde.
@@ -47,4 +47,14 @@ Resposta `201 Created`:
 }
 ```
 
-`Location` identifica a ilustração criada. A leitura pública depende das etapas de moderação e galeria. Pendentes e aprovadas ocupam as cinco vagas por artista. A API retorna `409` quando todas estão ocupadas, `413` para tamanho acima do limite e `415` quando a mídia não corresponde a um formato aceito. Até quatro uploads são processados simultaneamente por instância. O excesso recebe `429` e pode tentar novamente.
+`Location` identifica a ilustração criada. A leitura pública depende da etapa da galeria. Pendentes e aprovadas ocupam as cinco vagas por artista. A API retorna `409` quando todas estão ocupadas, `413` para tamanho acima do limite e `415` quando a mídia não corresponde a um formato aceito. Até quatro uploads são processados simultaneamente por instância. O excesso recebe `429` e pode tentar novamente.
+
+## Moderação
+
+As rotas abaixo exigem sessão de Moderador ou Admin.
+
+- `GET /api/moderacao/pendentes?page=1&pageSize=20` retorna `page`, `pageSize`, `total` e `itens`. Cada item contém `id`, `artistaId`, `titulo`, `descricao`, `categoria`, `status`, `criadoEm` e `imagemUrl`. O máximo de `pageSize` é 100.
+- `GET /api/moderacao/{id}/imagem` retorna WebP sem cache para ilustrações pendentes ou aprovadas. A API retorna `404` para imagem indisponível.
+- `POST /api/moderacao/{id}/decisao` exige CSRF e JSON com `acao` (`APROVAR`, `REJEITAR` ou `OCULTAR`) e `justificativa` obrigatória de até 2.000 caracteres. Retorna `204` para uma decisão aplicada, `404` para ilustração inexistente e `409` quando o estado atual impede a ação.
+
+Aprovar ou rejeitar exige estado pendente. Ocultar exige estado aprovado. O servidor registra o estado resultante, a ação, a justificativa, o autor e a data da decisão na mesma transação.

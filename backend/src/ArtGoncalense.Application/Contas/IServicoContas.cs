@@ -19,6 +19,7 @@ public static class AcessoConta
     public const string ContaDisponivel = "conta_disponivel";
     public const string EmailConfirmado = "email_confirmado";
     public const string PublicarIlustracao = "PublicarIlustracao";
+    public const string ModerarIlustracao = "ModerarIlustracao";
     public const int SenhaMinima = 15;
     public const int SenhaMaxima = 128;
 }

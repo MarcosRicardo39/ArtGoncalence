@@ -44,4 +44,13 @@ public sealed class Ilustracao
     public StatusIlustracao Status { get; private set; }
     public DateTimeOffset CriadoEm { get; }
     public DateTimeOffset AtualizadoEm { get; private set; }
+
+    public static (StatusIlustracao Anterior, StatusIlustracao Novo) TransicaoDeModeracao(TipoAcaoModeracao acao) =>
+        acao switch
+        {
+            TipoAcaoModeracao.Aprovar => (StatusIlustracao.Pendente, StatusIlustracao.Aprovada),
+            TipoAcaoModeracao.Rejeitar => (StatusIlustracao.Pendente, StatusIlustracao.Rejeitada),
+            TipoAcaoModeracao.Ocultar => (StatusIlustracao.Aprovada, StatusIlustracao.Oculta),
+            _ => throw new ArgumentOutOfRangeException(nameof(acao))
+        };
 }
