@@ -62,6 +62,8 @@ Na interface Angular, abra `/conta/cadastro`, use um e-mail fictício e copie o 
 
 A página inicial exibe a galeria pública. Com e-mail confirmado, abra `/publicar` para enviar uma ilustração à moderação. Depois da aprovação, ela aparece na galeria com um link para o perfil do artista.
 
+Uma sessão de Moderador ou Admin abre `/moderacao` após o login. O painel tem filas de ilustrações pendentes e denúncias, além da aba de obras aprovadas visíveis na galeria. As ações de revisão exigem justificativa e usam as permissões da API.
+
 ## Imagens de desenvolvimento
 
 Configure `Imagens__DiretorioLocal` com um caminho absoluto para um diretório privado e persistente fora do repositório. Com a API em desenvolvimento, um artista com e-mail confirmado pode enviar uma imagem para `POST /api/ilustracoes` conforme a [documentação da API](Docs/api-documentation.md).

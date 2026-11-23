@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { Acesso } from './acesso';
 import { Galeria, Ilustracao } from './galeria';
+import { Moderacao } from './moderacao';
 import { PerfilArtista } from './perfil';
 import { Publicar } from './publicar';
 
@@ -8,6 +9,7 @@ export const routes: Routes = [
   { path: '', pathMatch: 'full', component: Galeria, title: 'Galeria | ArtGoncalense' },
   { path: 'ilustracoes/:id', component: Ilustracao, title: 'Ilustração | ArtGoncalense' },
   { path: 'publicar', component: Publicar, title: 'Enviar ilustração | ArtGoncalense' },
+  { path: 'moderacao', component: Moderacao, title: 'Moderação | ArtGoncalense' },
   {
     path: 'conta/entrar',
     component: Acesso,

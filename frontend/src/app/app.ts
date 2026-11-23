@@ -1,6 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { ContaApi, mensagemDeErro } from './conta-api';
+import { ModeracaoApi } from './moderacao-api';
 
 @Component({
   imports: [RouterLink, RouterLinkActive, RouterOutlet],
@@ -10,11 +11,29 @@ import { ContaApi, mensagemDeErro } from './conta-api';
 export class App {
   private readonly api = inject(ContaApi);
   private readonly router = inject(Router);
+  private readonly moderacao = inject(ModeracaoApi);
   readonly sessao = this.api.sessao;
+  readonly moderador = signal(false);
   readonly saindo = signal(false);
   readonly erro = signal('');
 
   constructor() {
+    effect((limpar) => {
+      const id = this.sessao()?.id;
+      this.moderador.set(false);
+      if (!id) {
+        this.moderacao.limparAcesso();
+        return;
+      }
+
+      let vigente = true;
+      limpar(() => {
+        vigente = false;
+      });
+      void this.moderacao.podeAcessar(id).then((permitido) => {
+        if (vigente) this.moderador.set(permitido);
+      });
+    });
     void this.api.atualizarSessao().catch(() => {
       // O formulário informa erros de conexão quando o usuário tenta entrar.
     });

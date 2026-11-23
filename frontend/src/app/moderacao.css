@@ -1,0 +1,165 @@
+.moderacao-layout {
+  width: min(100% - 3rem, 69rem);
+  margin: clamp(1.25rem, 4vw, 3.5rem) auto 4rem;
+}
+.voltar {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+.abas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.35rem;
+  margin: 0 0 1.4rem;
+  border: 1px solid var(--linha);
+  border-radius: 0.65rem;
+  width: fit-content;
+  background: var(--papel);
+}
+.abas button {
+  padding: 0.53rem 0.88rem;
+  border: 0;
+  border-radius: 0.42rem;
+  background: transparent;
+  color: var(--suave);
+  font-weight: 650;
+  cursor: pointer;
+}
+.abas button[aria-pressed='true'] {
+  color: var(--vermelho-escuro);
+  background: #f3e6d9;
+}
+.fila-cabecalho {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin: 1.4rem 0 0.9rem;
+}
+.fila-cabecalho h2 {
+  font: 400 clamp(1.55rem, 3vw, 2.2rem)/1.1 var(--serifa);
+  letter-spacing: -0.04em;
+}
+.fila-cabecalho span,
+.artista {
+  color: var(--suave);
+  font-size: 0.88rem;
+}
+.fila {
+  display: grid;
+  gap: 0.9rem;
+}
+.revisao {
+  padding: 1rem;
+  border: 1px solid var(--linha);
+  border-radius: 0.85rem;
+  min-width: 0;
+  background: var(--papel);
+}
+.obra {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr);
+  gap: 1.35rem;
+}
+.obra figure {
+  min-width: 0;
+}
+.obra figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 22rem;
+  object-fit: contain;
+  background: var(--fundo);
+  border-radius: 0.55rem;
+}
+.obra figure a {
+  display: inline-block;
+  margin-top: 0.55rem;
+  font-size: 0.84rem;
+}
+.informacoes {
+  min-width: 0;
+  padding: 0.25rem 0.25rem 0.5rem 0;
+}
+.motivo {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 0.35rem;
+  background: #f3e6d9;
+  color: var(--vermelho-escuro);
+  font-size: 0.79rem;
+  font-weight: 650;
+}
+.obra h3 {
+  margin: 0.55rem 0 0.3rem;
+  font: 400 1.75rem/1.1 var(--serifa);
+  overflow-wrap: anywhere;
+}
+.descricao {
+  margin: 0.7rem 0;
+  color: var(--suave);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.acoes,
+.paginacao {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+.acoes .principal {
+  min-height: 2.7rem;
+  margin-top: 0;
+}
+.dados-denuncia {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0.9rem 0;
+}
+.dados-denuncia div {
+  min-width: 0;
+}
+.dados-denuncia dt {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.dados-denuncia dd {
+  margin: 0.2rem 0 0;
+  color: var(--suave);
+  overflow-wrap: anywhere;
+}
+.denuncia > .acoes {
+  margin-top: 0.8rem;
+}
+.formulario-decisao {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--linha);
+  border-radius: 0.6rem;
+  background: var(--fundo);
+}
+.formulario-decisao h4 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.tentar {
+  margin-top: 0.9rem;
+}
+.paginacao {
+  justify-content: center;
+  margin-top: 1.3rem;
+}
+@media (max-width: 620px) {
+  .moderacao-layout {
+    width: calc(100% - 2rem);
+  }
+  .obra {
+    grid-template-columns: 1fr;
+  }
+}

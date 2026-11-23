@@ -1,0 +1,214 @@
+<section class="moderacao-layout" [attr.aria-busy]="buscando() || enviando()">
+  <a class="voltar" routerLink="/">← Galeria</a>
+  <h1>Moderação</h1>
+  <p class="subtitulo">Revise ilustrações e acompanhe as denúncias da comunidade.</p>
+
+  @if (autorizado()) {
+    <nav class="abas" aria-label="Filas de moderação">
+      @for (item of abas; track item.id) {
+        <button
+          type="button"
+          [attr.aria-pressed]="aba() === item.id"
+          [disabled]="enviando()"
+          (click)="abrirAba(item.id)"
+        >
+          {{ item.rotulo }}
+        </button>
+      }
+    </nav>
+  }
+
+  @if (buscando()) {
+    <p class="mensagem" role="status">Carregando fila…</p>
+  }
+  @if (erro()) {
+    <p class="mensagem erro" role="alert">{{ erro() }}</p>
+    @if (!restrito()) {
+      <button type="button" class="botao secundario tentar" (click)="carregar()">
+        Tentar novamente
+      </button>
+    }
+  }
+  @if (aviso()) {
+    <p class="mensagem sucesso" role="status">{{ aviso() }}</p>
+  }
+
+  @if (autorizado() && !buscando() && !erro()) {
+    <div class="fila-cabecalho">
+      <h2>
+        {{
+          aba() === 'denuncias'
+            ? 'Denúncias recebidas'
+            : aba() === 'aprovadas'
+              ? 'Ilustrações aprovadas'
+              : 'Ilustrações pendentes'
+        }}
+      </h2>
+      <span>{{ total() }} {{ total() === 1 ? 'item' : 'itens' }}</span>
+    </div>
+
+    @if (aba() === 'denuncias') {
+      <div class="fila">
+        @for (item of denuncias(); track item.id) {
+          <article class="revisao denuncia">
+            <span class="motivo">{{
+              item.motivo === 'DIREITOS_AUTORAIS' ? 'Direitos autorais' : 'Outro motivo'
+            }}</span>
+            <p class="descricao">{{ item.descricao }}</p>
+            <dl class="dados-denuncia">
+              @if (item.contato) {
+                <div>
+                  <dt>Contato</dt>
+                  <dd>{{ item.contato }}</dd>
+                </div>
+              }
+              <div>
+                <dt>Recebida em</dt>
+                <dd>{{ item.criadoEm | date: 'dd/MM/yyyy, HH:mm' }}</dd>
+              </div>
+            </dl>
+            <a [routerLink]="['/ilustracoes', item.ilustracaoId]">Abrir ilustração pública</a>
+            <div class="acoes">
+              <button
+                type="button"
+                class="botao secundario"
+                [disabled]="enviando()"
+                (click)="escolher(item.id, 'ENCERRAR')"
+              >
+                Encerrar denúncia
+              </button>
+            </div>
+            @if (decisao()?.id === item.id) {
+              <ng-container [ngTemplateOutlet]="formularioDecisao" />
+            }
+          </article>
+        } @empty {
+          <p class="mensagem">Nenhuma denúncia recebida nesta fila.</p>
+        }
+      </div>
+    } @else {
+      <div class="fila">
+        @for (item of obras(); track item.id) {
+          <article class="revisao obra">
+            <figure>
+              <img [src]="item.imagemUrl" [alt]="item.titulo" loading="lazy" />
+              <a [href]="item.imagemUrl" target="_blank" rel="noopener"
+                >Abrir imagem em nova aba</a
+              >
+            </figure>
+            <div class="informacoes">
+              <span class="motivo">{{
+                item.categoria === 'ORIGINAL' ? 'Original' : 'Fanart'
+              }}</span>
+              <h3>{{ item.titulo }}</h3>
+              @if (item.artista) {
+                <p class="artista">{{ item.artista }}</p>
+              }
+              @if (item.descricao) {
+                <p class="descricao">{{ item.descricao }}</p>
+              }
+              <div class="acoes">
+                @if (aba() === 'pendentes') {
+                  <button
+                    type="button"
+                    class="botao principal"
+                    [disabled]="enviando()"
+                    (click)="escolher(item.id, 'APROVAR')"
+                  >
+                    Aprovar
+                  </button>
+                  <button
+                    type="button"
+                    class="botao secundario"
+                    [disabled]="enviando()"
+                    (click)="escolher(item.id, 'REJEITAR')"
+                  >
+                    Rejeitar
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    class="botao secundario"
+                    [disabled]="enviando()"
+                    (click)="escolher(item.id, 'OCULTAR')"
+                  >
+                    Ocultar
+                  </button>
+                }
+              </div>
+              @if (decisao()?.id === item.id) {
+                <ng-container [ngTemplateOutlet]="formularioDecisao" />
+              }
+            </div>
+          </article>
+        } @empty {
+          <p class="mensagem">
+            {{
+              aba() === 'pendentes'
+                ? 'Nenhuma ilustração aguarda revisão.'
+                : 'Nenhuma ilustração aprovada na galeria.'
+            }}
+          </p>
+        }
+      </div>
+    }
+
+    @if (paginas() > 1) {
+      <nav class="paginacao" aria-label="Páginas da fila">
+        <button
+          type="button"
+          class="botao secundario"
+          [disabled]="pagina() === 1 || enviando()"
+          (click)="mudarPagina(pagina() - 1)"
+        >
+          Anterior
+        </button>
+        <span aria-current="page">Página {{ pagina() }} de {{ paginas() }}</span>
+        <button
+          type="button"
+          class="botao secundario"
+          [disabled]="pagina() === paginas() || enviando()"
+          (click)="mudarPagina(pagina() + 1)"
+        >
+          Próxima
+        </button>
+      </nav>
+    }
+  }
+</section>
+
+<ng-template #formularioDecisao>
+  @if (decisao(); as atual) {
+    <form class="formulario-decisao" (submit)="$event.preventDefault(); confirmar()" novalidate>
+      <h4>{{ rotulos[atual.acao] }}</h4>
+      <div class="campo">
+        <label for="justificativa-moderacao">Justificativa</label>
+        <textarea
+          id="justificativa-moderacao"
+          [formControl]="justificativa"
+          rows="3"
+          maxlength="2000"
+          [attr.aria-invalid]="justificativa.touched && justificativa.invalid"
+          aria-describedby="justificativa-erro"
+          required
+        ></textarea>
+        <span id="justificativa-erro" class="campo-erro">
+          @if (justificativa.touched && justificativa.invalid) {
+            Informe a justificativa.
+          }
+        </span>
+      </div>
+      @if (erroDecisao()) {
+        <p class="mensagem erro" role="alert">{{ erroDecisao() }}</p>
+      }
+      <div class="acoes">
+        <button type="submit" class="botao principal" [disabled]="enviando()">
+          {{ enviando() ? 'Registrando…' : 'Confirmar' }}
+        </button>
+        <button type="button" class="botao secundario" [disabled]="enviando()" (click)="cancelar()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  }
+</ng-template>

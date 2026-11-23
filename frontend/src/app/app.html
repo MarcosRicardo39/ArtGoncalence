@@ -8,9 +8,15 @@
   </a>
   <nav aria-label="Conta">
     @if (sessao()) {
-      <a routerLink="/conta/perfil" routerLinkActive="atual" ariaCurrentWhenActive="page"
-        >Meu perfil</a
-      >
+      @if (moderador()) {
+        <a routerLink="/moderacao" routerLinkActive="atual" ariaCurrentWhenActive="page"
+          >Moderação</a
+        >
+      } @else {
+        <a routerLink="/conta/perfil" routerLinkActive="atual" ariaCurrentWhenActive="page"
+          >Meu perfil</a
+        >
+      }
       <button type="button" class="botao secundario" [disabled]="saindo()" (click)="sair()">
         {{ saindo() ? 'Saindo…' : 'Sair' }}
       </button>

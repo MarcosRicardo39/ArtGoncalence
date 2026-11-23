@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ContaApi, mensagemDeErro } from './conta-api';
+import { ModeracaoApi } from './moderacao-api';
 
 type Modo = 'entrar' | 'cadastro' | 'confirmar' | 'reenviar' | 'recuperar' | 'redefinir';
 
@@ -38,6 +39,7 @@ const TEXTOS = {
 export class Acesso {
   private readonly api = inject(ContaApi);
   private readonly router = inject(Router);
+  private readonly moderacao = inject(ModeracaoApi);
   readonly modo = inject(ActivatedRoute).snapshot.data['modo'] as Modo;
   readonly textos = TEXTOS[this.modo];
 
@@ -80,6 +82,12 @@ export class Acesso {
     }),
   });
 
+  private async abrirAreaDaConta(): Promise<void> {
+    const id = this.api.sessao()?.id;
+    const moderador = id ? await this.moderacao.podeAcessar(id) : false;
+    await this.router.navigateByUrl(moderador ? '/moderacao' : '/conta/perfil');
+  }
+
   async enviar(): Promise<void> {
     this.formulario.markAllAsTouched();
     if (this.formulario.invalid || this.operando()) return;
@@ -94,7 +102,7 @@ export class Acesso {
       switch (this.modo) {
         case 'entrar':
           await this.api.autenticar(endereco, senha);
-          await this.router.navigateByUrl('/conta/perfil');
+          await this.abrirAreaDaConta();
           break;
         case 'cadastro':
           await this.api.enviar('registrar', {
