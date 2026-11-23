@@ -54,4 +54,6 @@ Na T04, o contexto persiste instantes em UTC, aplica integridade por chaves estr
 5. API devolve status HTTP e resposta sem expor dados sensíveis.
 
 ## 7. Integrações e limites
-Não armazenar imagens no disco efêmero do servidor. Não expor credenciais de storage no Angular. Usar HTTPS e CORS restrito às origens aprovadas. Estratégia de consistência entre upload e registro no banco precisa ser definida antes de implementar uploads.
+O armazenamento local da T07 usa um diretório privado configurado para desenvolvimento. O nome final é gerado pelo servidor e a gravação só fica disponível após mover o arquivo temporário, sem sobrescrita. A operação de reconciliação remove temporários e objetos sem referência de ilustração ou avatar com mais de 24 horas. Na integração da T08, compensar falhas de persistência confirmadas com exclusão idempotente e usar a reconciliação para interrupções ou resultados de commit incertos.
+
+Não armazenar imagens no disco efêmero do servidor. Não expor credenciais de storage no Angular. Usar HTTPS e CORS restrito às origens aprovadas. Validar o provedor persistente e as cotas na T18.

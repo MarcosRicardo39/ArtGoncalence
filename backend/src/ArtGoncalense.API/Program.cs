@@ -1,5 +1,7 @@
 using ArtGoncalense.API.Contas;
 using ArtGoncalense.Application.Artistas;
+using ArtGoncalense.Application.Imagens;
+using ArtGoncalense.Infrastructure.Imagens;
 using ArtGoncalense.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +15,29 @@ builder.Services.AddProblemDetails();
 builder.AdicionarContas();
 builder.Services.AddScoped<ServicoPerfis>();
 builder.Services.AddScoped<IRepositorioPerfis, RepositorioPerfis>();
+builder.Services.AddSingleton<IProcessadorImagens, ProcessadorImagens>();
+builder.Services.AddSingleton<ArmazenamentoImagensLocal>(services =>
+{
+    var ambiente = services.GetRequiredService<IWebHostEnvironment>();
+    var diretorio = services.GetRequiredService<IConfiguration>()["Imagens:DiretorioLocal"];
+    if (!ambiente.IsDevelopment() || string.IsNullOrWhiteSpace(diretorio))
+    {
+        throw new InvalidOperationException("Configure o armazenamento privado de imagens de desenvolvimento.");
+    }
+
+    var raiz = Path.GetFullPath(diretorio);
+    var relativo = Path.GetRelativePath(ambiente.ContentRootPath, raiz);
+    if (!Path.IsPathFullyQualified(diretorio) || relativo == "."
+        || (!Path.IsPathRooted(relativo) && relativo != ".."
+            && !relativo.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal)))
+    {
+        throw new InvalidOperationException("Use um diretório absoluto fora da raiz da aplicação para as imagens.");
+    }
+
+    return new ArmazenamentoImagensLocal(raiz);
+});
+builder.Services.AddSingleton<IArmazenamentoImagens>(services => services.GetRequiredService<ArmazenamentoImagensLocal>());
+builder.Services.AddScoped<ReconciliadorImagens>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ArtGoncalenseDbContext>((services, options) =>

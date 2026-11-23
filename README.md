@@ -55,3 +55,9 @@ Os testes aplicam migrations no banco indicado. Use um banco descartável, pois 
 Execute a API no perfil HTTPS de desenvolvimento. Antes de iniciá-la, configure `$env:Contas__DiretorioEmailLocal = Join-Path ([System.IO.Path]::GetTempPath()) 'artgoncalense-email'`. O diretório deve ser privado e fora do repositório. Os arquivos JSON contêm códigos temporários e devem ser tratados como credenciais. Use somente endereços fictícios e remova os arquivos ao encerrar os testes manuais.
 
 Os fluxos e os cabeçalhos estão na [documentação da API](Docs/api-documentation.md). Os limites de autenticação podem ser ajustados por variáveis `Contas__Limites__LoginPorIp`, `Contas__Limites__CorreioPorIp`, `Contas__Limites__EnviosPorEmail` e `Contas__Limites__FalhasPorConta`.
+
+## Imagens de desenvolvimento
+
+Configure `Imagens__DiretorioLocal` com um caminho absoluto para um diretório privado e persistente fora do repositório. A T07 oferece processamento, armazenamento e reconciliação internos. A rota de publicação será integrada na T08.
+
+As [amostras de ilustrações](backend/tests/ArtGoncalense.Tests/Fixtures/README.md) exercitam o processamento em três estilos. Os testes usam diretório descartável e dados fictícios.
