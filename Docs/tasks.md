@@ -1,7 +1,7 @@
 # Plano de implementação — ArtGoncalense
 
 ## 1. Regras de execução
-**Estado: T01 concluída. T02 a T20 pendentes.** Executar somente tarefas autorizadas; marcar concluída apenas após evidência. Não fazer deploy ou criar recursos externos por conta própria. Referências: requirements.md, architecture.md e specifications.md.
+**Estado: T01 e T02 concluídas. T03 a T20 pendentes.** Executar somente tarefas autorizadas; marcar concluída apenas após evidência. Não fazer deploy ou criar recursos externos por conta própria. Referências: requirements.md, architecture.md e specifications.md.
 
 | ID | Tarefa | Dependências | Critério de conclusão |
 |---|---|---|---|
@@ -30,3 +30,4 @@
 Ao concluir cada tarefa, anotar data, arquivos alterados, testes executados, resultado e decisões atualizadas. Se um requisito mudar, atualizar primeiro os documentos SDD afetados e reavaliar dependências.
 
 - **2026-11-23 — T01.** Aprovação registrada em [decisions.md](decisions.md). Nome atualizado nos oito documentos e contrato de cadastro alinhado à resposta uniforme. Revisão documental das DA-01 a DA-07. Build e testes de software não se aplicam.
+- **2026-11-23 — T02.** Git local inicializado. Solução .NET com API, Domain, Application, Infrastructure e projeto xUnit. Frontend Angular com lockfile, README e regras de ignore. SDK .NET 10.0.404, Angular 22.3.0, Node.js 24.21.0 e npm 11.19.0. Build .NET sem avisos e build Angular aprovados. A API respondeu ao `GET /openapi/v1.json` local. Dois testes Angular passaram. `dotnet test` executado com zero casos xUnit, previstos a partir da T03. Auditorias NuGet (incluindo transitivas) e npm sem vulnerabilidades conhecidas nas fontes consultadas.

@@ -28,7 +28,7 @@ ArtGoncalense/
 - Sem referências circulares; sem lógica de negócio nos Controllers.
 
 ## 4. Componentes
-- Identidade: ASP.NET Core Identity ou equivalente consolidado, com papéis Artista/Moderador/Admin; decidir em DA-03.
+- Identidade: ASP.NET Core Identity com papéis Artista/Moderador/Admin. A escolha entre cookie e token está adiada na DA-03.
 - Persistência: PostgreSQL via EF Core e migrations versionadas.
 - Imagens: Supabase Storage ou serviço compatível; arquivos fora do banco; banco guarda metadados e caminho.
 - Apoio: URL externa cadastrada e validada; nenhuma transação financeira intermediada.
