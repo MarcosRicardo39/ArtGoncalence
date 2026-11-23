@@ -1,0 +1,92 @@
+<section class="perfil-layout" [attr.aria-busy]="buscando()">
+  @if (editavel) {
+    <h1>Meu perfil</h1>
+  }
+  @if (buscando()) {
+    <p class="mensagem" role="status">Carregando perfil…</p>
+  }
+  @if (erro()) {
+    <p class="mensagem erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (perfil(); as atual) {
+    @if (editavel) {
+      <p class="subtitulo">Escolha como seu nome e sua biografia aparecem para visitantes.</p>
+      @if (sessao()?.emailConfirmado === false) {
+        <div class="perfil-aviso">
+          <div>
+            <strong>Confirme seu e-mail</strong>
+            <p>A confirmação habilita o envio de ilustrações.</p>
+          </div>
+          <a class="botao secundario" routerLink="/conta/confirmar-email">Tenho o código</a>
+        </div>
+      }
+
+      <div class="perfil-cartao">
+        <div class="perfil-cabecalho">
+          <span class="avatar" aria-hidden="true">{{ iniciais(atual.nomePublico) }}</span>
+          <div>
+            <h2>{{ atual.nomePublico }}</h2>
+            <a [routerLink]="['/artistas', atual.id]">Ver perfil público</a>
+          </div>
+        </div>
+
+        <form [formGroup]="formulario" (ngSubmit)="salvar()" novalidate>
+          <div class="campo">
+            <label for="nome-perfil">Nome público</label>
+            <input
+              id="nome-perfil"
+              formControlName="nomePublico"
+              autocomplete="nickname"
+              maxlength="200"
+              required
+              aria-describedby="nome-perfil-erro"
+              [attr.aria-invalid]="
+                formulario.controls.nomePublico.touched && formulario.controls.nomePublico.invalid
+              "
+            />
+            <span id="nome-perfil-erro" class="campo-erro">
+              @if (
+                formulario.controls.nomePublico.touched && formulario.controls.nomePublico.invalid
+              ) {
+                Informe o nome público.
+              }
+            </span>
+          </div>
+
+          <div class="campo">
+            <label for="bio">Biografia <span class="opcional">(opcional)</span></label>
+            <textarea
+              id="bio"
+              formControlName="bio"
+              rows="5"
+              maxlength="2000"
+              aria-describedby="bio-limite"
+            ></textarea>
+            <span id="bio-limite" class="campo-dica">Até 2.000 caracteres.</span>
+          </div>
+          @if (aviso()) {
+            <p class="mensagem sucesso" role="status">{{ aviso() }}</p>
+          }
+          <button class="botao principal" type="submit" [disabled]="salvando()">
+            {{ salvando() ? 'Salvando…' : 'Salvar alterações' }}
+          </button>
+        </form>
+      </div>
+    } @else {
+      <div class="perfil-cartao publico">
+        <span class="avatar grande" aria-hidden="true">{{ iniciais(atual.nomePublico) }}</span>
+        <h1>{{ atual.nomePublico }}</h1>
+        @if (atual.bio) {
+          <p class="biografia">{{ atual.bio }}</p>
+        }
+        @if (sessao()?.id === atual.id) {
+          <a class="botao secundario" routerLink="/conta/perfil">Editar meu perfil</a>
+        }
+      </div>
+    }
+  } @else if (!editavel && !buscando()) {
+    <h1>Perfil indisponível</h1>
+    <a routerLink="/">Voltar ao início</a>
+  }
+</section>

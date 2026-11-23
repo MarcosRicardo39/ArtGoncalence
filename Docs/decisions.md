@@ -4,7 +4,7 @@ As decisões DA-01 a DA-07 foram aprovadas ou explicitamente adiadas em 23/11/20
 
 | ID | Decisão | Proposta | Estado |
 |---|---|---|---|
-| DA-01 | Nome público e identidade visual | ArtGoncalense é o nome definitivo | Identidade visual adiada até antes da T11 |
+| DA-01 | Nome público e identidade visual | ArtGoncalense é o nome definitivo. A T11 usa uma identidade visual provisória com tons de papel e terracota, tipografia serifada nos títulos e a ilustração de São Gonçalo. | Prévia implementada para revisão do usuário. |
 | DA-02 | Versões e nomenclatura | .NET 10 LTS, Angular 22 e Node.js 24 compatível. Campos de negócio em português e campos de Problem Details preservados | Aprovada. Fixar versões exatas na T02 |
 | DA-03 | Identidade, autenticação e confirmação | ASP.NET Core Identity com cookie de sessão `HttpOnly`, `Secure` e `SameSite=Lax`; proteção CSRF nas operações que alteram estado e logout por `POST`. Confirmar e-mail antes de publicar. Cadastro válido recebe `202` genérico, inclusive para e-mail já cadastrado. | Cookie aprovado. Na T18, validar frontend e `/api` na mesma origem pública, dentro do orçamento. |
 | DA-04 | Conteúdo, direitos autorais e denúncias | Moderação manual por Moderador ou Admin. Pendente pode ser aprovada ou rejeitada. Aprovada pode ser ocultada. Cada decisão exige justificativa e auditoria. A reabertura fica adiada. Visitantes podem denunciar ilustrações aprovadas com motivo e descrição, CSRF e limite de cinco requisições por IP em 15 minutos. Contato é obrigatório para direitos autorais e opcional nos demais casos. Moderador ou Admin encerra a denúncia com justificativa. | Fluxos da T09 e T10 aprovados para validação local. A política pública de conteúdo e direitos autorais segue pendente de revisão jurídica. |

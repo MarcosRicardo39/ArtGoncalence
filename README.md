@@ -24,6 +24,8 @@ npm ci
 npm start
 ```
 
+O Angular serve a interface em `https://localhost:4200` e encaminha `/api` para `https://localhost:7218` em desenvolvimento. Use HTTPS para que o navegador aceite os cookies `Secure`.
+
 ## Verificações
 
 ```powershell
@@ -55,6 +57,8 @@ Os testes aplicam migrations no banco indicado. Use um banco descartável, pois 
 Execute a API no perfil HTTPS de desenvolvimento. Antes de iniciá-la, configure `$env:Contas__DiretorioEmailLocal = Join-Path ([System.IO.Path]::GetTempPath()) 'artgoncalense-email'`. O diretório deve ser privado e fora do repositório. Os arquivos JSON contêm códigos temporários e devem ser tratados como credenciais. Use somente endereços fictícios e remova os arquivos ao encerrar os testes manuais.
 
 Os fluxos e os cabeçalhos estão na [documentação da API](Docs/api-documentation.md). Os limites de autenticação podem ser ajustados por variáveis `Contas__Limites__LoginPorIp`, `Contas__Limites__CorreioPorIp`, `Contas__Limites__EnviosPorEmail` e `Contas__Limites__FalhasPorConta`.
+
+Na interface Angular, abra `/conta/cadastro`, use um e-mail fictício e copie o campo `codigo` da mensagem de confirmação gerada no diretório local para `/conta/confirmar-email`. Depois de entrar, `/conta/perfil` permite editar nome e biografia e abrir o perfil público. Para recuperação de senha, use o código da mensagem com finalidade `recuperacao`.
 
 ## Imagens de desenvolvimento
 

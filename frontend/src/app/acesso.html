@@ -1,0 +1,182 @@
+<section class="acesso-layout" aria-label="Acesso à conta">
+  <figure class="arte">
+    <img
+      src="/imagens/sao-goncalo.webp"
+      alt="Ilustração de uma artista desenhando a paisagem de São Gonçalo ao pôr do sol"
+      width="1280"
+      height="854"
+      fetchpriority="high"
+    />
+    <figcaption>
+      <span>Do alto de São Gonçalo</span>
+      <small>Ilustração original · ArtGoncalense</small>
+    </figcaption>
+  </figure>
+
+  <div class="acesso-painel">
+    <div class="acesso-conteudo">
+      <h1>{{ textos[0] }}</h1>
+      <p class="subtitulo">{{ textos[1] }}</p>
+
+      <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+        @if (pedeNome) {
+          <div class="campo">
+            <label for="nome-acesso">Nome público</label>
+            <input
+              id="nome-acesso"
+              formControlName="nomePublico"
+              autocomplete="nickname"
+              maxlength="200"
+              [attr.aria-invalid]="
+                formulario.controls.nomePublico.touched && formulario.controls.nomePublico.invalid
+              "
+              aria-describedby="nome-acesso-erro"
+              required
+            />
+            <span id="nome-acesso-erro" class="campo-erro">
+              @if (
+                formulario.controls.nomePublico.touched && formulario.controls.nomePublico.invalid
+              ) {
+                Informe seu nome público.
+              }
+            </span>
+          </div>
+        }
+
+        <div class="campo">
+          <label for="email">E-mail</label>
+          <input
+            id="email"
+            formControlName="email"
+            type="email"
+            autocomplete="email"
+            maxlength="256"
+            placeholder="voce@exemplo.com"
+            required
+            aria-describedby="email-erro"
+            [attr.aria-invalid]="
+              formulario.controls.email.touched && formulario.controls.email.invalid
+            "
+          />
+          <span id="email-erro" class="campo-erro">
+            @if (formulario.controls.email.touched && formulario.controls.email.invalid) {
+              Informe um e-mail válido.
+            }
+          </span>
+        </div>
+
+        @if (pedeCodigo) {
+          <div class="campo">
+            <label for="codigo">Código recebido</label>
+            <input
+              id="codigo"
+              formControlName="codigo"
+              autocomplete="one-time-code"
+              maxlength="4096"
+              required
+              aria-describedby="codigo-erro"
+              [attr.aria-invalid]="
+                formulario.controls.codigo.touched && formulario.controls.codigo.invalid
+              "
+            />
+            <span id="codigo-erro" class="campo-erro">
+              @if (formulario.controls.codigo.touched && formulario.controls.codigo.invalid) {
+                Informe o código.
+              }
+            </span>
+          </div>
+        }
+
+        @if (pedeSenha) {
+          <div class="campo">
+            <div class="rotulo-linha">
+              <label for="senha">{{ modo === 'redefinir' ? 'Nova senha' : 'Senha' }}</label>
+              @if (modo === 'entrar') {
+                <a routerLink="/conta/recuperar-senha">Esqueceu a senha?</a>
+              }
+            </div>
+            <div class="senha-campo">
+              <input
+                id="senha"
+                formControlName="senha"
+                [type]="senhaVisivel() ? 'text' : 'password'"
+                [autocomplete]="modo === 'entrar' ? 'current-password' : 'new-password'"
+                maxlength="128"
+                aria-describedby="senha-dica senha-erro"
+                required
+                [attr.aria-invalid]="
+                  formulario.controls.senha.touched && formulario.controls.senha.invalid
+                "
+              />
+              <button
+                class="senha-alternar"
+                type="button"
+                (click)="senhaVisivel.set(!senhaVisivel())"
+              >
+                {{ senhaVisivel() ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
+            <span id="senha-dica" class="campo-dica">
+              @if (modo !== 'entrar') {
+                Use pelo menos 15 caracteres.
+              }
+            </span>
+            <span id="senha-erro" class="campo-erro">
+              @if (formulario.controls.senha.touched && formulario.controls.senha.invalid) {
+                {{
+                  modo === 'entrar'
+                    ? 'Informe sua senha.'
+                    : 'A senha precisa ter de 15 a 128 caracteres.'
+                }}
+              }
+            </span>
+          </div>
+        }
+
+        @if (erro()) {
+          <p class="mensagem erro" role="alert">{{ erro() }}</p>
+        }
+        @if (aviso()) {
+          <p class="mensagem sucesso" role="status">{{ aviso() }}</p>
+        }
+        <button class="botao principal" type="submit" [disabled]="operando()">
+          {{ operando() ? 'Aguarde…' : textos[2] }}
+        </button>
+      </form>
+
+      <div class="acesso-links">
+        @switch (modo) {
+          @case ('entrar') {
+            Ainda não tem conta? <a routerLink="/conta/cadastro">Cadastre-se</a>
+          }
+          @case ('cadastro') {
+            Já tem conta? <a routerLink="/conta/entrar">Entre</a>
+            @if (aviso()) {
+              <a class="link-bloco" routerLink="/conta/confirmar-email"
+                >Inserir código de confirmação</a
+              >
+            }
+          }
+          @case ('confirmar') {
+            @if (aviso() && sessaoAtiva()) {
+              <a routerLink="/conta/perfil">Voltar ao meu perfil</a>
+            } @else {
+              <a routerLink="/conta/entrar">Voltar para entrar</a>
+            }
+            <a class="link-bloco" routerLink="/conta/reenviar-confirmacao">Reenviar confirmação</a>
+          }
+          @case ('reenviar') {
+            <a routerLink="/conta/confirmar-email">Inserir código de confirmação</a>
+          }
+          @case ('recuperar') {
+            <a routerLink="/conta/entrar">Voltar para entrar</a>
+            <a class="link-bloco" routerLink="/conta/redefinir-senha">Já tenho o código</a>
+          }
+          @case ('redefinir') {
+            <a routerLink="/conta/entrar">Voltar para entrar</a>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</section>
