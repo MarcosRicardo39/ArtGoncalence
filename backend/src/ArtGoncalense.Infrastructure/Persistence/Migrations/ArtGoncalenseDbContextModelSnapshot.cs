@@ -67,8 +67,17 @@ namespace ArtGoncalense.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset?>("EncerradaEm")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("EncerradaPorId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("IlustracaoId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("JustificativaEncerramento")
+                        .HasColumnType("text");
 
                     b.Property<string>("Motivo")
                         .IsRequired()
@@ -79,6 +88,8 @@ namespace ArtGoncalense.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EncerradaPorId");
 
                     b.HasIndex("IlustracaoId");
 
@@ -344,6 +355,11 @@ namespace ArtGoncalense.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("ArtGoncalense.Domain.Denuncia", b =>
                 {
+                    b.HasOne("ArtGoncalense.Domain.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("EncerradaPorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("ArtGoncalense.Domain.Ilustracao", null)
                         .WithMany()
                         .HasForeignKey("IlustracaoId")

@@ -39,10 +39,10 @@ ArtGoncalense/
 - Usuario: Id, Email, NomePublico, Bio, AvatarPath, Papel, Status, CriadoEm.
 - LinkApoio: Id, UsuarioId, Url, Ativo.
 - Ilustracao: Id, UsuarioId, Titulo, Descricao, Categoria, NomeArquivo, CaminhoStorage, MimeType, TamanhoBytes, Status, CriadoEm, AtualizadoEm.
-- Denuncia: Id, IlustracaoId, Contato, Motivo, Descricao, Status, CriadoEm.
+- Denuncia: Id, IlustracaoId, Contato, Motivo, Descricao, Status, CriadoEm, EncerradaPorId, EncerradaEm, JustificativaEncerramento.
 - AcaoModeracao: Id, IlustracaoId, ModeradorId, Acao, Justificativa, CriadoEm.
 
-Na T03, os identificadores internos usam `Guid` e as datas usam `DateTimeOffset`. Ilustrações começam pendentes, com a data de atualização igual à de criação. A ação de moderação exige identificadores da ilustração e do moderador e uma justificativa. Biografia, avatar e contato de denúncia admitem ausência no modelo. O status de denúncia é armazenado como texto no domínio até a definição do fluxo da T10.
+Os identificadores internos usam `Guid` e as datas usam `DateTimeOffset`. Ilustrações começam pendentes, com a data de atualização igual à de criação. A ação de moderação exige identificadores da ilustração e do moderador e uma justificativa. Biografia, avatar e contato de denúncia admitem ausência no modelo. Denúncias da T10 começam `RECEBIDA` e a revisão encerra para `ENCERRADA`, com autor, data e justificativa na mesma atualização. Contato é obrigatório nas notificações de direitos autorais e os dados da denúncia são consultados pela moderação.
 
 Na T04, o contexto persiste instantes em UTC, aplica integridade por chaves estrangeiras e restringe exclusões em cascata até a definição dos fluxos de exclusão. O índice de e-mail garante unicidade do valor armazenado. A normalização de identidade será tratada na T05. A API recebe a conexão por configuração e aplica migrations por comando explícito.
 

@@ -1,7 +1,7 @@
 # Documentação da API — ArtGoncalense
 
 ## Estado
-As rotas de contas, perfis, criação de ilustração e moderação estão implementadas. Os demais caminhos de [specifications.md](specifications.md) são contratos propostos.
+As rotas de contas, perfis, criação de ilustração, moderação e denúncias estão implementadas. Os demais caminhos de [specifications.md](specifications.md) são contratos propostos.
 
 ## Convenções
 - Base: `/api` para recursos de negócio; `/health` para saúde.
@@ -58,3 +58,11 @@ As rotas abaixo exigem sessão de Moderador ou Admin.
 - `POST /api/moderacao/{id}/decisao` exige CSRF e JSON com `acao` (`APROVAR`, `REJEITAR` ou `OCULTAR`) e `justificativa` obrigatória de até 2.000 caracteres. Retorna `204` para uma decisão aplicada, `404` para ilustração inexistente e `409` quando o estado atual impede a ação.
 
 Aprovar ou rejeitar exige estado pendente. Ocultar exige estado aprovado. O servidor registra o estado resultante, a ação, a justificativa, o autor e a data da decisão na mesma transação.
+
+## Denúncias
+
+`POST /api/ilustracoes/{id}/denuncias` aceita solicitações de visitantes com CSRF para ilustrações aprovadas. Envie JSON com `motivo` (`DIREITOS_AUTORAIS` ou `OUTRO`), `descricao` obrigatória de até 2.000 caracteres e `contato` como e-mail de até 256 caracteres. O contato é obrigatório em notificações de direitos autorais. A resposta de sucesso é `202` sem corpo. O limite soma as solicitações por IP em todos os alvos, até cinco a cada 15 minutos.
+
+`GET /api/moderacao/denuncias?page=1&pageSize=20` retorna `page`, `pageSize`, `total` e `itens`. Os itens são denúncias recebidas e incluem `id`, `ilustracaoId`, `motivo`, `descricao`, `contato` e `criadoEm`. O máximo de `pageSize` é 100. A fila exige sessão de Moderador ou Admin e é servida sem cache.
+
+`POST /api/moderacao/denuncias/{id}/encerrar` exige o mesmo papel, CSRF e `justificativa` obrigatória de até 2.000 caracteres. A API grava o estado `ENCERRADA`, a justificativa, o autor e a data. A visibilidade da ilustração continua sob controle das decisões de moderação.

@@ -1,4 +1,5 @@
 using System.Threading.RateLimiting;
+using ArtGoncalense.API.Denuncias;
 using ArtGoncalense.Application.Contas;
 using ArtGoncalense.Domain;
 using ArtGoncalense.Infrastructure.Identidade;
@@ -106,6 +107,7 @@ internal static class ConfiguracaoContas
             options.AddPolicy(Login, context => Particao(context, loginPorIp, janela));
             options.AddPolicy(Correio, context => Particao(context, correioPorIp, janela));
             options.AddPolicy(Codigo, context => Particao(context, loginPorIp, janela));
+            options.AddPolicy(DenunciasController.PoliticaPorIp, context => ParticaoPorIp(context, 5, janela));
         });
     }
 
@@ -117,13 +119,19 @@ internal static class ConfiguracaoContas
 
     private static RateLimitPartition<string> Particao(HttpContext context, int limite, TimeSpan janela)
     {
+        return ParticaoPorIp(context, limite, janela, context.GetEndpoint()?.DisplayName);
+    }
+
+    private static RateLimitPartition<string> ParticaoPorIp(HttpContext context, int limite, TimeSpan janela,
+        string? operacao = null)
+    {
         var endereco = context.Connection.RemoteIpAddress;
         if (endereco?.IsIPv4MappedToIPv6 == true)
         {
             endereco = endereco.MapToIPv4();
         }
 
-        var chave = $"{context.GetEndpoint()?.DisplayName}:{endereco}";
+        var chave = $"{operacao}:{endereco}";
         return RateLimitPartition.GetFixedWindowLimiter(chave, _ => new FixedWindowRateLimiterOptions
         {
             PermitLimit = limite,

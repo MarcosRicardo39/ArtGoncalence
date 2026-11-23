@@ -1,7 +1,7 @@
 # Especificações — ArtGoncalense
 
 ## 1. Referências e estado
-Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). As rotas de contas, perfis, criação de ilustração e moderação estão implementadas. As demais seguem propostas. JSON em português e erros no formato Problem Details. O provedor de e-mail para ambiente público depende da DA-05.
+Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). As rotas de contas, perfis, criação de ilustração, moderação e denúncias estão implementadas. As demais seguem propostas. JSON em português e erros no formato Problem Details. O provedor de e-mail para ambiente público depende da DA-05.
 
 ## 2. Fluxo de cadastro
 1. Visitante informa e-mail, senha e nome público.
@@ -36,10 +36,12 @@ Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). A
 | GET | `/api/ilustracoes/{id}` | Público | 200 ou 404 |
 | POST | `/api/ilustracoes` | Artista confirmado | 201 com status PENDENTE |
 | DELETE | `/api/ilustracoes/{id}` | Titular ou moderador | 204 |
-| POST | `/api/ilustracoes/{id}/denuncias` | Público, com antiabuso | 202 |
+| POST | `/api/ilustracoes/{id}/denuncias` | Público, com CSRF e limite por IP | 202, 404 para ilustração inexistente ou fora do estado aprovado, 429 acima do limite |
 | GET | `/api/moderacao/pendentes` | Moderador ou administrador | 200 com fila paginada |
 | GET | `/api/moderacao/{id}/imagem` | Moderador ou administrador | 200 com WebP privado de ilustração pendente ou aprovada, ou 404 |
 | POST | `/api/moderacao/{id}/decisao` | Moderador ou administrador, com CSRF | 204 em caso de sucesso, 409 se o estado não permitir a decisão |
+| GET | `/api/moderacao/denuncias` | Moderador ou administrador | 200 com fila privada paginada de denúncias recebidas |
+| POST | `/api/moderacao/denuncias/{id}/encerrar` | Moderador ou administrador, com CSRF | 204 em caso de sucesso, 404 para denúncia inexistente, 409 se já encerrada |
 | GET | `/health` | Operacional | 200/503 |
 
 ## 5. Validação e erros

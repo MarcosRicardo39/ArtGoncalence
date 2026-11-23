@@ -77,6 +77,8 @@ public sealed class ArtGoncalenseDbContext(DbContextOptions<ArtGoncalenseDbConte
         denuncia.Property(x => x.Descricao);
         denuncia.Property(x => x.Status);
         denuncia.Property(x => x.CriadoEm);
+        denuncia.HasOne<Usuario>().WithMany().HasForeignKey(x => x.EncerradaPorId)
+            .OnDelete(DeleteBehavior.Restrict);
         denuncia.HasOne<Ilustracao>().WithMany().HasForeignKey(x => x.IlustracaoId)
             .OnDelete(DeleteBehavior.Restrict);
 

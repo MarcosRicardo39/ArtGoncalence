@@ -1,6 +1,7 @@
 using ArtGoncalense.API.Contas;
 using ArtGoncalense.API.Ilustracoes;
 using ArtGoncalense.Application.Artistas;
+using ArtGoncalense.Application.Denuncias;
 using ArtGoncalense.Application.Ilustracoes;
 using ArtGoncalense.Application.Imagens;
 using ArtGoncalense.Application.Moderacao;
@@ -23,6 +24,8 @@ builder.Services.AddScoped<ServicoPublicacao>();
 builder.Services.AddScoped<IRepositorioPublicacoes, RepositorioPublicacoes>();
 builder.Services.AddScoped<ServicoModeracao>();
 builder.Services.AddScoped<IRepositorioModeracao, RepositorioModeracao>();
+builder.Services.AddScoped<ServicoDenuncias>();
+builder.Services.AddScoped<IRepositorioDenuncias, RepositorioDenuncias>();
 builder.Services.AddRateLimiter(options => options.AddConcurrencyLimiter(
     IlustracoesController.PoliticaConcorrenciaUpload, limiter =>
     {
