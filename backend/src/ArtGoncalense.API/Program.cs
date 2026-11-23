@@ -1,9 +1,12 @@
 using ArtGoncalense.API.Contas;
+using ArtGoncalense.API.Ilustracoes;
 using ArtGoncalense.Application.Artistas;
+using ArtGoncalense.Application.Ilustracoes;
 using ArtGoncalense.Application.Imagens;
 using ArtGoncalense.Infrastructure.Imagens;
 using ArtGoncalense.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +18,14 @@ builder.Services.AddProblemDetails();
 builder.AdicionarContas();
 builder.Services.AddScoped<ServicoPerfis>();
 builder.Services.AddScoped<IRepositorioPerfis, RepositorioPerfis>();
+builder.Services.AddScoped<ServicoPublicacao>();
+builder.Services.AddScoped<IRepositorioPublicacoes, RepositorioPublicacoes>();
+builder.Services.AddRateLimiter(options => options.AddConcurrencyLimiter(
+    IlustracoesController.PoliticaConcorrenciaUpload, limiter =>
+    {
+        limiter.PermitLimit = 4;
+        limiter.QueueLimit = 0;
+    }));
 builder.Services.AddSingleton<IProcessadorImagens, ProcessadorImagens>();
 builder.Services.AddSingleton<ArmazenamentoImagensLocal>(services =>
 {
@@ -64,9 +75,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllers();
 

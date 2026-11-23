@@ -2,7 +2,9 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using ArtGoncalense.Application.Contas;
+using ArtGoncalense.Application.Imagens;
 using ArtGoncalense.Domain;
+using ArtGoncalense.Infrastructure.Imagens;
 using ArtGoncalense.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -15,7 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace ArtGoncalense.Tests;
 
 [Collection("PostgreSQL local")]
-public sealed class ContasTests
+public sealed partial class ApiTests
 {
     private const string Senha = "frase de teste longa";
     private const string NovaSenha = "outra frase de teste longa";
@@ -217,9 +219,10 @@ public sealed class ContasTests
         return await cliente.SendAsync(pedido);
     }
 
-    private sealed class Aplicacao : WebApplicationFactory<Program>
+    private sealed class Aplicacao(bool sincronizarUploads = false) : WebApplicationFactory<Program>
     {
         private readonly DirectoryInfo correio = Directory.CreateTempSubdirectory("artgoncalense-contas-");
+        private readonly DirectoryInfo imagens = Directory.CreateTempSubdirectory("artgoncalense-publicacoes-");
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -228,9 +231,18 @@ public sealed class ContasTests
                 new Dictionary<string, string?>
                 {
                     ["ConnectionStrings:ArtGoncalense"] = Environment.GetEnvironmentVariable(PostgreSqlFactAttribute.ConnectionVariable),
-                    ["Contas:DiretorioEmailLocal"] = correio.FullName
+                    ["Contas:DiretorioEmailLocal"] = correio.FullName,
+                    ["Imagens:DiretorioLocal"] = imagens.FullName
                 }));
-            builder.ConfigureServices(services => services.AddControllers().AddApplicationPart(typeof(ContasTests).Assembly));
+            builder.ConfigureServices(services =>
+            {
+                services.AddControllers().AddApplicationPart(typeof(ApiTests).Assembly);
+                if (sincronizarUploads)
+                {
+                    services.AddSingleton<IArmazenamentoImagens>(provider =>
+                        new ArmazenamentoSincronizado(provider.GetRequiredService<ArmazenamentoImagensLocal>()));
+                }
+            });
         }
 
         public async Task<HttpClient> CriarClienteAsync()
@@ -260,12 +272,19 @@ public sealed class ContasTests
             return codigos;
         }
 
+        public string[] ImagensArmazenadas() => imagens.EnumerateFiles().Select(arquivo => arquivo.Name).ToArray();
+
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
             if (disposing && correio.Exists)
             {
                 correio.Delete(recursive: true);
+            }
+
+            if (disposing && imagens.Exists)
+            {
+                imagens.Delete(recursive: true);
             }
         }
     }

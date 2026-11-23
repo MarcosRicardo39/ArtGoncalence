@@ -58,6 +58,6 @@ Os fluxos e os cabeçalhos estão na [documentação da API](Docs/api-documentat
 
 ## Imagens de desenvolvimento
 
-Configure `Imagens__DiretorioLocal` com um caminho absoluto para um diretório privado e persistente fora do repositório. A T07 oferece processamento, armazenamento e reconciliação internos. A rota de publicação será integrada na T08.
+Configure `Imagens__DiretorioLocal` com um caminho absoluto para um diretório privado e persistente fora do repositório. Com a API em desenvolvimento, um artista com e-mail confirmado pode enviar uma imagem para `POST /api/ilustracoes` conforme a [documentação da API](Docs/api-documentation.md).
 
 As [amostras de ilustrações](backend/tests/ArtGoncalense.Tests/Fixtures/README.md) exercitam o processamento em três estilos. Os testes usam diretório descartável e dados fictícios.

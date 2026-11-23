@@ -1,7 +1,7 @@
 # Especificações — ArtGoncalense
 
 ## 1. Referências e estado
-Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). As rotas de contas e perfis de artista estão implementadas. As demais seguem propostas. JSON em português e erros no formato Problem Details. O provedor de e-mail para ambiente público depende da DA-05.
+Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). As rotas de contas, perfis de artista e criação de ilustração estão implementadas. As demais seguem propostas. JSON em português e erros no formato Problem Details. O provedor de e-mail para ambiente público depende da DA-05.
 
 ## 2. Fluxo de cadastro
 1. Visitante informa e-mail, senha e nome público.
@@ -12,7 +12,7 @@ Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). A
 
 ## 3. Fluxo de publicação
 1. Artista autenticado envia título, descrição, categoria (`ORIGINAL` ou `FANART`) e imagem.
-2. API valida titularidade, limite de cinco publicações ativas, tipo e tamanho real da imagem.
+2. API usa o artista confirmado da sessão e valida o limite de cinco publicações pendentes ou aprovadas, além do tipo e tamanho real da imagem.
 3. Arquivo é processado/otimizado, validado e enviado a armazenamento persistente.
 4. Registro é salvo com status `PENDENTE`.
 5. Moderador decide `APROVADA` ou `REJEITADA`, com justificativa.

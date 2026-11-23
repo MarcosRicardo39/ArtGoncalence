@@ -76,6 +76,7 @@ internal static class ConfiguracaoContas
         services.AddAntiforgery(options =>
         {
             options.HeaderName = "X-XSRF-TOKEN";
+            options.SuppressReadingTokenFromFormBody = true;
             options.Cookie.Name = "__Host-ArtGoncalense-Csrf";
             options.Cookie.Path = "/";
             options.Cookie.HttpOnly = true;
