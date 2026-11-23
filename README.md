@@ -33,4 +33,4 @@ npm run build
 npm test -- --watch=false
 ```
 
-O projeto xUnit está disponível para os primeiros testes de domínio na T03. A estrutura inicial funciona localmente sem PostgreSQL, armazenamento de imagens ou provedor de e-mail.
+Os testes xUnit verificam as invariantes do modelo de domínio. A aplicação funciona localmente sem PostgreSQL, armazenamento de imagens ou provedor de e-mail nesta etapa.

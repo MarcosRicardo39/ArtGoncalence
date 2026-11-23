@@ -18,4 +18,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ArtGoncalense.Domain\ArtGoncalense.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

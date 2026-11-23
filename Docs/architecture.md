@@ -42,6 +42,8 @@ ArtGoncalense/
 - Denuncia: Id, IlustracaoId, Contato, Motivo, Descricao, Status, CriadoEm.
 - AcaoModeracao: Id, IlustracaoId, ModeradorId, Acao, Justificativa, CriadoEm.
 
+Na T03, os identificadores internos usam `Guid` e as datas usam `DateTimeOffset`. Ilustrações começam pendentes, com a data de atualização igual à de criação. A ação de moderação exige identificadores da ilustração e do moderador e uma justificativa. Biografia, avatar e contato de denúncia admitem ausência no modelo. O status de denúncia é armazenado como texto no domínio até a definição do fluxo da T10.
+
 ## 6. Segurança e fluxo
 1. API autentica o usuário e identifica seu papel.
 2. Controller valida o contrato HTTP e chama Application.

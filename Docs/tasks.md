@@ -1,7 +1,7 @@
 # Plano de implementação — ArtGoncalense
 
 ## 1. Regras de execução
-**Estado: T01 e T02 concluídas. T03 a T20 pendentes.** Executar somente tarefas autorizadas; marcar concluída apenas após evidência. Não fazer deploy ou criar recursos externos por conta própria. Referências: requirements.md, architecture.md e specifications.md.
+**Estado: T01 a T03 concluídas. T04 a T20 pendentes.** Executar somente tarefas autorizadas; marcar concluída apenas após evidência. Não fazer deploy ou criar recursos externos por conta própria. Referências: requirements.md, architecture.md e specifications.md.
 
 | ID | Tarefa | Dependências | Critério de conclusão |
 |---|---|---|---|
@@ -31,3 +31,4 @@ Ao concluir cada tarefa, anotar data, arquivos alterados, testes executados, res
 
 - **2026-11-23 — T01.** Aprovação registrada em [decisions.md](decisions.md). Nome atualizado nos oito documentos e contrato de cadastro alinhado à resposta uniforme. Revisão documental das DA-01 a DA-07. Build e testes de software não se aplicam.
 - **2026-11-23 — T02.** Git local inicializado. Solução .NET com API, Domain, Application, Infrastructure e projeto xUnit. Frontend Angular com lockfile, README e regras de ignore. SDK .NET 10.0.404, Angular 22.3.0, Node.js 24.21.0 e npm 11.19.0. Build .NET sem avisos e build Angular aprovados. A API respondeu ao `GET /openapi/v1.json` local. Dois testes Angular passaram. `dotnet test` executado com zero casos xUnit, previstos a partir da T03. Auditorias NuGet (incluindo transitivas) e npm sem vulnerabilidades conhecidas nas fontes consultadas.
+- **2026-11-23 — T03.** Criados os modelos de usuário, link de apoio, ilustração, denúncia e ação de moderação, com enums e invariantes locais. Build .NET com zero avisos e erros. `dotnet test backend/ArtGoncalense.sln --no-build` aprovou 14 casos. A revisão confirmou estado inicial pendente para ilustrações, rejeição de identificadores de vínculo vazios e exigência de autoria e justificativa na ação de moderação. Autorização e políticas de publicação serão verificadas nas suas etapas.
