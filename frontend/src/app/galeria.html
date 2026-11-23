@@ -1,0 +1,91 @@
+<div class="galeria-layout">
+  <section class="galeria-hero" aria-labelledby="titulo-galeria">
+    <div class="galeria-intro">
+      <h1 id="titulo-galeria">
+        Galeria de<br />
+        ilustrações
+      </h1>
+      <p>Arte original e fanarts da comunidade ArtGoncalense.</p>
+      <a class="botao principal" [routerLink]="sessao() ? '/publicar' : '/conta/cadastro'">
+        {{ sessao() ? 'Enviar desenho' : 'Quero publicar' }}
+      </a>
+    </div>
+    <img src="/imagens/sao-goncalo.webp" alt="" width="1280" height="854" fetchpriority="high" />
+  </section>
+
+  <section class="galeria-obras" aria-labelledby="obras" [attr.aria-busy]="buscando()">
+    <div class="galeria-titulo">
+      <h2 id="obras">Ilustrações recentes</h2>
+      @if (dados(); as paginaDados) {
+        <span
+          >{{ paginaDados.total }}
+          {{ paginaDados.total === 1 ? 'ilustração' : 'ilustrações' }}</span
+        >
+      }
+    </div>
+    @if (buscando()) {
+      <p class="mensagem" role="status">Carregando ilustrações…</p>
+    }
+    @if (erro()) {
+      <p class="mensagem erro" role="alert">{{ erro() }}</p>
+      <button type="button" class="botao secundario galeria-tentar" (click)="carregar()">
+        Tentar novamente
+      </button>
+    }
+    @if (dados(); as paginaDados) {
+      @if (paginaDados.itens.length) {
+        <div class="galeria-grade">
+          @for (item of paginaDados.itens; track item.id) {
+            <article class="obra-cartao">
+              <a
+                class="obra-imagem"
+                [routerLink]="['/ilustracoes', item.id]"
+                [attr.aria-label]="'Ver ' + item.titulo"
+              >
+                <img [src]="item.imagemUrl" [alt]="item.titulo" loading="lazy" />
+              </a>
+              <div class="obra-texto">
+                <span class="obra-categoria">{{
+                  item.categoria === 'ORIGINAL' ? 'Original' : 'Fanart'
+                }}</span>
+                <h3>
+                  <a [routerLink]="['/ilustracoes', item.id]">{{ item.titulo }}</a>
+                </h3>
+                <a class="obra-artista" [routerLink]="['/artistas', item.artista.id]">{{
+                  item.artista.nomePublico
+                }}</a>
+              </div>
+            </article>
+          }
+        </div>
+      } @else {
+        <p class="mensagem">
+          {{
+            paginaDados.total
+              ? 'Esta página não tem ilustrações.'
+              : 'A galeria aguarda as primeiras ilustrações aprovadas.'
+          }}
+        </p>
+        @if (pagina() > 1) {
+          <a class="botao secundario galeria-tentar" routerLink="/">Voltar à primeira página</a>
+        }
+      }
+
+      @if (paginas() > 1 && pagina() <= paginas()) {
+        <nav class="galeria-paginacao" aria-label="Páginas da galeria">
+          @if (pagina() > 1) {
+            <a class="botao secundario" routerLink="/" [queryParams]="{ page: pagina() - 1 }"
+              >Anterior</a
+            >
+          }
+          <span aria-current="page">Página {{ pagina() }} de {{ paginas() }}</span>
+          @if (pagina() < paginas()) {
+            <a class="botao secundario" routerLink="/" [queryParams]="{ page: pagina() + 1 }"
+              >Próxima</a
+            >
+          }
+        </nav>
+      }
+    }
+  </section>
+</div>

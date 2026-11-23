@@ -46,7 +46,7 @@ export class ContaApi {
   }
 
   enviar(operacao: string, dados: object): Promise<void> {
-    return this.mutar('POST', `/api/contas/${operacao}`, dados);
+    return this.mutarComCsrf('POST', `/api/contas/${operacao}`, dados);
   }
 
   perfil(id: string): Promise<Perfil> {
@@ -54,12 +54,12 @@ export class ContaApi {
   }
 
   editarPerfil(nomePublico: string, bio: string | null): Promise<void> {
-    return this.mutar('PUT', '/api/artistas/me', { nomePublico, bio });
+    return this.mutarComCsrf('PUT', '/api/artistas/me', { nomePublico, bio });
   }
 
-  private async mutar(metodo: 'POST' | 'PUT', url: string, body: object): Promise<void> {
+  async mutarComCsrf<T = void>(metodo: 'POST' | 'PUT', url: string, body: object): Promise<T> {
     await firstValueFrom(this.http.get<void>('/api/contas/csrf'));
-    await firstValueFrom(this.http.request<void>(metodo, url, { body }));
+    return firstValueFrom(this.http.request<T>(metodo, url, { body }));
   }
 }
 

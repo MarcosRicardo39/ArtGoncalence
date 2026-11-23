@@ -1,7 +1,7 @@
 # Documentação da API — ArtGoncalense
 
 ## Estado
-As rotas de contas, perfis, criação de ilustração, moderação e denúncias estão implementadas. Os demais caminhos de [specifications.md](specifications.md) são contratos propostos.
+As rotas de contas, perfis, criação e consulta pública de ilustrações, moderação e denúncias estão implementadas. Os demais caminhos de [specifications.md](specifications.md) são contratos propostos.
 
 ## Convenções
 - Base: `/api` para recursos de negócio; `/health` para saúde.
@@ -47,7 +47,13 @@ Resposta `201 Created`:
 }
 ```
 
-`Location` identifica a ilustração criada. A leitura pública depende da etapa da galeria. Pendentes e aprovadas ocupam as cinco vagas por artista. A API retorna `409` quando todas estão ocupadas, `413` para tamanho acima do limite e `415` quando a mídia não corresponde a um formato aceito. Até quatro uploads são processados simultaneamente por instância. O excesso recebe `429` e pode tentar novamente.
+`Location` identifica a ilustração criada. A leitura pública fica disponível após aprovação. Pendentes e aprovadas ocupam as cinco vagas por artista. A API retorna `409` quando todas estão ocupadas, `413` para tamanho acima do limite e `415` quando a mídia não corresponde a um formato aceito. Até quatro uploads são processados simultaneamente por instância. O excesso recebe `429` e pode tentar novamente.
+
+## Galeria pública
+
+`GET /api/ilustracoes?page=1&pageSize=20` retorna `page`, `pageSize`, `total` e `itens`. O máximo de `pageSize` é 100. A ordem é da publicação mais recente para a mais antiga, com desempate por identificador.
+
+Cada item e o detalhe em `GET /api/ilustracoes/{id}` incluem `id`, `titulo`, `descricao`, `categoria`, `criadoEm`, `artista` com `id` e `nomePublico`, e `imagemUrl`. Apenas ilustrações aprovadas de artistas disponíveis são públicas. A rota de imagem retorna WebP com `Cache-Control: no-store`. Detalhes e imagem retornam `404` quando a publicação não está visível.
 
 ## Moderação
 

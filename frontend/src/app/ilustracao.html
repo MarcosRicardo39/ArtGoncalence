@@ -1,0 +1,24 @@
+<section class="obra-detalhe" [attr.aria-busy]="buscando()">
+  <a class="obra-voltar" routerLink="/">← Galeria</a>
+  @if (buscando()) {
+    <p class="mensagem" role="status">Carregando ilustração…</p>
+  }
+  @if (erro()) {
+    <p class="mensagem erro" role="alert">{{ erro() }}</p>
+  }
+  @if (item(); as obra) {
+    <div class="obra-detalhe-grade">
+      <figure><img [src]="obra.imagemUrl" [alt]="obra.titulo" /></figure>
+      <div class="obra-detalhe-texto">
+        <span class="obra-categoria">{{
+          obra.categoria === 'ORIGINAL' ? 'Original' : 'Fanart'
+        }}</span>
+        <h1>{{ obra.titulo }}</h1>
+        <a [routerLink]="['/artistas', obra.artista.id]">{{ obra.artista.nomePublico }}</a>
+        @if (obra.descricao) {
+          <p class="biografia">{{ obra.descricao }}</p>
+        }
+      </div>
+    </div>
+  }
+</section>

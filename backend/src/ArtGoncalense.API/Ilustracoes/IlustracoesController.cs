@@ -12,10 +12,71 @@ namespace ArtGoncalense.API.Ilustracoes;
 
 [ApiController]
 [Route("api/ilustracoes")]
-public sealed class IlustracoesController(ServicoPublicacao publicacao) : ControllerBase
+public sealed class IlustracoesController : ControllerBase
 {
     public const string PoliticaConcorrenciaUpload = "ConcorrenciaUploadIlustracao";
     private const int LimiteRequisicao = LimitesImagem.EntradaBytes + 64 * 1024;
+
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> Listar([FromServices] IRepositorioGaleria galeria,
+        [FromQuery, Range(1, int.MaxValue)] int page = 1, [FromQuery, Range(1, 100)] int pageSize = 20,
+        CancellationToken cancellationToken = default)
+    {
+        var resultado = await galeria.ListarAsync(page, pageSize, cancellationToken);
+        return Ok(new { page, pageSize, total = resultado.Total, itens = resultado.Itens.Select(RespostaPublica) });
+    }
+
+    [HttpGet("{id:guid}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Buscar(Guid id, [FromServices] IRepositorioGaleria galeria,
+        CancellationToken cancellationToken)
+    {
+        var item = await galeria.BuscarAsync(id, cancellationToken);
+        return item is null ? NotFound() : Ok(RespostaPublica(item));
+    }
+
+    [HttpGet("{id:guid}/imagem")]
+    [AllowAnonymous]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> Imagem(Guid id, [FromServices] IRepositorioGaleria galeria,
+        [FromServices] IArmazenamentoImagens armazenamento, CancellationToken cancellationToken)
+    {
+        var chave = await galeria.BuscarChaveAsync(id, cancellationToken);
+        if (chave is null)
+        {
+            return NotFound();
+        }
+
+        Stream? fluxo;
+        try
+        {
+            fluxo = await armazenamento.AbrirAsync(chave, cancellationToken);
+        }
+        catch (ArgumentException)
+        {
+            return NotFound();
+        }
+
+        if (fluxo is null)
+        {
+            return NotFound();
+        }
+
+        Response.Headers.XContentTypeOptions = "nosniff";
+        return File(fluxo, ImagemOtimizada.Tipo);
+    }
+
+    private static object RespostaPublica(IlustracaoPublica item) => new
+    {
+        id = item.Id,
+        titulo = item.Titulo,
+        descricao = item.Descricao,
+        categoria = item.Categoria == CategoriaIlustracao.Original ? "ORIGINAL" : "FANART",
+        criadoEm = item.CriadoEm,
+        artista = new { id = item.ArtistaId, nomePublico = item.NomePublico },
+        imagemUrl = $"/api/ilustracoes/{item.Id}/imagem"
+    };
 
     [Authorize(Policy = AcessoConta.PublicarIlustracao)]
     [EnableRateLimiting(PoliticaConcorrenciaUpload)]
@@ -23,7 +84,8 @@ public sealed class IlustracoesController(ServicoPublicacao publicacao) : Contro
     [Consumes("multipart/form-data")]
     [RequestSizeLimit(LimiteRequisicao)]
     [RequestFormLimits(MultipartBodyLengthLimit = LimiteRequisicao, ValueLengthLimit = 8192, ValueCountLimit = 8)]
-    public async Task<IActionResult> Publicar([FromForm] DadosPublicacao dados, CancellationToken cancellationToken)
+    public async Task<IActionResult> Publicar([FromForm] DadosPublicacao dados,
+        [FromServices] ServicoPublicacao publicacao, CancellationToken cancellationToken)
     {
         if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var artistaId))
         {

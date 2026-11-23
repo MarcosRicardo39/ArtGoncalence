@@ -1,0 +1,90 @@
+<section class="perfil-layout publicacao-layout" [attr.aria-busy]="carregando() || enviando()">
+  <a class="obra-voltar" routerLink="/">← Galeria</a>
+  <h1>Enviar ilustração</h1>
+
+  @if (carregando()) {
+    <p class="mensagem" role="status">Verificando sua sessão…</p>
+  }
+  @if (erro()) {
+    <p class="mensagem erro" role="alert">{{ erro() }}</p>
+  }
+
+  @if (!carregando() && sessao()?.emailConfirmado === false) {
+    <div class="perfil-aviso publicacao-aviso">
+      <div>
+        <strong>Confirme seu e-mail</strong>
+        <p>A confirmação habilita o envio de ilustrações.</p>
+      </div>
+      <a class="botao secundario" routerLink="/conta/confirmar-email">Confirmar e-mail</a>
+    </div>
+  }
+
+  @if (enviado()) {
+    <div class="publicacao-pronta" role="status">
+      <h2>Ilustração enviada</h2>
+      <p>Ela está aguardando moderação e aparecerá na galeria se for aprovada.</p>
+      <button class="botao secundario" type="button" (click)="enviado.set(false)">
+        Enviar outra
+      </button>
+    </div>
+  } @else if (!carregando() && sessao()?.emailConfirmado) {
+    <p class="subtitulo">A ilustração entra na fila de moderação antes de aparecer na galeria.</p>
+    <div class="perfil-cartao">
+      <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+        <div class="campo">
+          <label for="titulo-obra">Título</label>
+          <input
+            id="titulo-obra"
+            formControlName="titulo"
+            maxlength="200"
+            required
+            aria-describedby="titulo-erro"
+            [attr.aria-invalid]="
+              formulario.controls.titulo.touched && formulario.controls.titulo.invalid
+            "
+          />
+          <span id="titulo-erro" class="campo-erro">
+            @if (formulario.controls.titulo.touched && formulario.controls.titulo.invalid) {
+              Informe um título.
+            }
+          </span>
+        </div>
+        <div class="campo">
+          <label for="descricao-obra">Descrição <span class="opcional">(opcional)</span></label>
+          <textarea
+            id="descricao-obra"
+            formControlName="descricao"
+            rows="4"
+            maxlength="2000"
+          ></textarea>
+        </div>
+        <div class="campo">
+          <label for="categoria-obra">Categoria</label>
+          <select id="categoria-obra" formControlName="categoria">
+            <option value="ORIGINAL">Original</option>
+            <option value="FANART">Fanart</option>
+          </select>
+        </div>
+        <div class="campo campo-arquivo">
+          <label for="arquivo-obra">Imagem</label>
+          <input
+            id="arquivo-obra"
+            type="file"
+            accept=".jpg,.jpeg,.png,.webp"
+            (change)="selecionar($event)"
+            aria-describedby="arquivo-dica arquivo-erro"
+            [attr.aria-invalid]="!!erroArquivo()"
+            required
+          />
+          <span id="arquivo-dica" class="campo-dica"
+            >JPEG, PNG ou WebP estático · até 10 MB e 4.096 px por lado.</span
+          >
+          <span id="arquivo-erro" class="campo-erro" aria-live="polite">{{ erroArquivo() }}</span>
+        </div>
+        <button class="botao principal" type="submit" [disabled]="enviando()">
+          {{ enviando() ? 'Enviando…' : 'Enviar para moderação' }}
+        </button>
+      </form>
+    </div>
+  }
+</section>

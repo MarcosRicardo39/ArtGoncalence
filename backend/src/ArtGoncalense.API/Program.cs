@@ -22,6 +22,7 @@ builder.Services.AddScoped<ServicoPerfis>();
 builder.Services.AddScoped<IRepositorioPerfis, RepositorioPerfis>();
 builder.Services.AddScoped<ServicoPublicacao>();
 builder.Services.AddScoped<IRepositorioPublicacoes, RepositorioPublicacoes>();
+builder.Services.AddScoped<IRepositorioGaleria, RepositorioGaleria>();
 builder.Services.AddScoped<ServicoModeracao>();
 builder.Services.AddScoped<IRepositorioModeracao, RepositorioModeracao>();
 builder.Services.AddScoped<ServicoDenuncias>();

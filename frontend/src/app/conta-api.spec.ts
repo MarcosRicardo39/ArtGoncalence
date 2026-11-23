@@ -34,10 +34,8 @@ describe('Conta e perfil', () => {
     expect(login.request.headers.get('X-XSRF-TOKEN')).toBe('token-de-teste');
     expect(login.request.body).toEqual({ email: 'artista@example.test', senha: 'senha fictícia' });
     login.flush(null);
-    await Promise.resolve();
-    await Promise.resolve();
-
-    http.expectOne('/api/contas/sessao').flush({ id: 'artista', emailConfirmado: false });
+    const sessao = await vi.waitFor(() => http.expectOne('/api/contas/sessao'));
+    sessao.flush({ id: 'artista', emailConfirmado: false });
     await autenticacao;
     expect(api.sessao()?.id).toBe('artista');
 

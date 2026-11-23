@@ -1,7 +1,7 @@
 # Especificações — ArtGoncalense
 
 ## 1. Referências e estado
-Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). As rotas de contas, perfis, criação de ilustração, moderação e denúncias estão implementadas. As demais seguem propostas. JSON em português e erros no formato Problem Details. O provedor de e-mail para ambiente público depende da DA-05.
+Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). As rotas de contas, perfis, criação e consulta pública de ilustrações, moderação e denúncias estão implementadas. As demais seguem propostas. JSON em português e erros no formato Problem Details. O provedor de e-mail para ambiente público depende da DA-05.
 
 ## 2. Fluxo de cadastro
 1. Visitante informa e-mail, senha e nome público.
@@ -33,7 +33,8 @@ Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). A
 | GET | `/api/artistas/{id}` | Público | 200 com `id`, `nomePublico` e `bio`, ou 404 |
 | PUT | `/api/artistas/me` | Artista titular, com CSRF | 204 em caso de sucesso |
 | GET | `/api/ilustracoes?page=1&pageSize=20` | Público | 200, apenas aprovadas |
-| GET | `/api/ilustracoes/{id}` | Público | 200 ou 404 |
+| GET | `/api/ilustracoes/{id}` | Público | 200 para ilustração aprovada com artista disponível, ou 404 |
+| GET | `/api/ilustracoes/{id}/imagem` | Público | 200 com WebP da ilustração aprovada, ou 404 |
 | POST | `/api/ilustracoes` | Artista confirmado | 201 com status PENDENTE |
 | DELETE | `/api/ilustracoes/{id}` | Titular ou moderador | 204 |
 | POST | `/api/ilustracoes/{id}/denuncias` | Público, com CSRF e limite por IP | 202, 404 para ilustração inexistente ou fora do estado aprovado, 429 acima do limite |

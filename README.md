@@ -60,6 +60,8 @@ Os fluxos e os cabeçalhos estão na [documentação da API](Docs/api-documentat
 
 Na interface Angular, abra `/conta/cadastro`, use um e-mail fictício e copie o campo `codigo` da mensagem de confirmação gerada no diretório local para `/conta/confirmar-email`. Depois de entrar, `/conta/perfil` permite editar nome e biografia e abrir o perfil público. Para recuperação de senha, use o código da mensagem com finalidade `recuperacao`.
 
+A página inicial exibe a galeria pública. Com e-mail confirmado, abra `/publicar` para enviar uma ilustração à moderação. Depois da aprovação, ela aparece na galeria com um link para o perfil do artista.
+
 ## Imagens de desenvolvimento
 
 Configure `Imagens__DiretorioLocal` com um caminho absoluto para um diretório privado e persistente fora do repositório. Com a API em desenvolvimento, um artista com e-mail confirmado pode enviar uma imagem para `POST /api/ilustracoes` conforme a [documentação da API](Docs/api-documentation.md).
