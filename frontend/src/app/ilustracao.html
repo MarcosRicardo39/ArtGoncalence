@@ -27,5 +27,65 @@
         }
       </div>
     </div>
+    <section class="perfil-cartao" aria-labelledby="titulo-denuncia">
+      <h2 id="titulo-denuncia">Denunciar ilustração</h2>
+      @if (denunciaEnviada()) {
+        <p class="mensagem sucesso" role="status">Denúncia recebida pela moderação.</p>
+      } @else if (denunciaAberta()) {
+        <form #denuncia="ngForm" (ngSubmit)="denunciar(obra.id)">
+          <div class="campo">
+            <label for="motivo-denuncia">Motivo</label>
+            <select id="motivo-denuncia" name="motivo" [(ngModel)]="motivo">
+              <option value="OUTRO">Outro motivo</option>
+              <option value="DIREITOS_AUTORAIS">Direitos autorais</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="descricao-denuncia">Descrição</label>
+            <textarea
+              id="descricao-denuncia"
+              name="descricao"
+              [(ngModel)]="descricao"
+              maxlength="2000"
+              rows="4"
+              required
+            ></textarea>
+          </div>
+          <div class="campo">
+            <label for="contato-denuncia"
+              >E-mail de contato{{ motivo === 'OUTRO' ? ' (opcional)' : '' }}</label
+            >
+            <input
+              id="contato-denuncia"
+              name="contato"
+              [(ngModel)]="contato"
+              type="email"
+              email
+              autocomplete="email"
+              maxlength="256"
+              [required]="motivo === 'DIREITOS_AUTORAIS'"
+              aria-describedby="dica-contato-denuncia"
+            />
+            <span id="dica-contato-denuncia" class="campo-dica"
+              >Somente a equipe de moderação terá acesso ao contato.</span
+            >
+          </div>
+          @if (erroDenuncia()) {
+            <p class="mensagem erro" role="alert">{{ erroDenuncia() }}</p>
+          }
+          <button
+            class="botao principal"
+            type="submit"
+            [disabled]="denuncia.invalid || !descricao.trim() || denunciaEnviando()"
+          >
+            {{ denunciaEnviando() ? 'Enviando…' : 'Enviar denúncia' }}
+          </button>
+        </form>
+      } @else {
+        <button class="botao secundario" type="button" (click)="denunciaAberta.set(true)">
+          Abrir formulário
+        </button>
+      }
+    </section>
   }
 </section>

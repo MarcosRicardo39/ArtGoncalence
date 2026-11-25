@@ -64,4 +64,57 @@ describe('Galeria e publicação', () => {
     requisicao.flush({ id: 'obra', status: 'PENDENTE' });
     await expect(envio).resolves.toEqual({ id: 'obra', status: 'PENDENTE' });
   });
+
+  it('exige contato em denúncia de direitos autorais e envia pelo canal público com CSRF', async () => {
+    document.cookie = 'XSRF-TOKEN=token-de-teste;path=/';
+    const harness = await RouterTestingHarness.create();
+    const navegacao = harness.navigateByUrl('/ilustracoes/obra');
+    const consulta = await vi.waitFor(() => http.expectOne('/api/ilustracoes/obra'));
+    consulta.flush({
+      id: 'obra',
+      titulo: 'A baía',
+      categoria: 'ORIGINAL',
+      artista: { id: 'artista', nomePublico: 'Artista' },
+      imagemUrl: '/api/ilustracoes/obra/imagem',
+    });
+    await navegacao;
+    harness.detectChanges();
+    const tela = harness.routeNativeElement!;
+    tela.querySelector<HTMLButtonElement>('button[type=button]')!.click();
+    harness.detectChanges();
+    await harness.fixture.whenStable();
+    const motivo = tela.querySelector<HTMLSelectElement>('#motivo-denuncia')!;
+    const descricao = tela.querySelector<HTMLTextAreaElement>('#descricao-denuncia')!;
+    const contato = tela.querySelector<HTMLInputElement>('#contato-denuncia')!;
+    const botao = tela.querySelector<HTMLButtonElement>('button[type=submit]')!;
+    motivo.value = 'DIREITOS_AUTORAIS';
+    motivo.dispatchEvent(new Event('change'));
+    descricao.value = 'Descrição da denúncia';
+    descricao.dispatchEvent(new Event('input'));
+    harness.detectChanges();
+    expect(botao.disabled).toBe(true);
+    contato.value = 'titular@example.test';
+    contato.dispatchEvent(new Event('input'));
+    await vi.waitFor(() => {
+      harness.detectChanges();
+      expect(botao.disabled).toBe(false);
+    });
+    botao.click();
+    http.expectOne('/api/contas/csrf').flush(null);
+    const requisicao = await vi.waitFor(() => http.expectOne('/api/ilustracoes/obra/denuncias'));
+    expect(requisicao.request.method).toBe('POST');
+    expect(requisicao.request.headers.get('X-XSRF-TOKEN')).toBe('token-de-teste');
+    expect(requisicao.request.body).toEqual({
+      motivo: 'DIREITOS_AUTORAIS',
+      descricao: 'Descrição da denúncia',
+      contato: 'titular@example.test',
+    });
+    requisicao.flush(null, { status: 202, statusText: 'Accepted' });
+    await vi.waitFor(() => {
+      harness.detectChanges();
+      expect(harness.routeNativeElement!.textContent).toContain(
+        'Denúncia recebida pela moderação.',
+      );
+    });
+  });
 });
