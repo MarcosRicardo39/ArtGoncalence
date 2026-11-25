@@ -24,6 +24,14 @@ Cloudflare Pages permanece uma opção para os arquivos estáticos. Com uma API 
 5. Aplicar migrations explicitamente com credencial separada da aplicação. Antes de cada migração, exportar o PostgreSQL e copiar os objetos privados com inventário de chaves. Fazer exportações periódicas durante o piloto e guardar tudo em local criptografado com acesso restrito. Testar restauração isolada do dump e dos objetos, verificando que pedidos de exclusão já concluídos sejam respeitados antes de reabrir o ambiente. A exportação do banco não contém os arquivos de Storage. [Backups Supabase](https://supabase.com/docs/guides/platform/backups).
 6. Acompanhar os painéis de uso. Como margem inicial do piloto, revisar consumo ao atingir 70% de banda, armazenamento ou cota de e-mail e pausar novos envios a partir de 85% se não houver margem para concluir o teste. Se um deploy falhar, retomar a versão anterior compatível com o esquema, verificar `/health` e repetir os fluxos de sessão, galeria e exclusão antes de liberar o acesso aos participantes.
 
+## Empacotamento do piloto
+
+O `Dockerfile` compila o Angular e a API e executa o contêiner na porta 10000 com usuário sem privilégios. O contêiner inclui os arquivos do Angular em `wwwroot`. Em modo piloto, o acesso à interface e à API exige HTTPS e credencial de entrada, além da sessão da aplicação nas operações autenticadas. A credencial de entrada só deve ser compartilhada com os participantes. `GET /health` fica disponível ao monitor do provedor.
+
+Configurar `Piloto__Senha` no painel de segredos com um valor aleatório independente. O usuário da credencial de entrada é `piloto`. Quando TLS terminar no proxy, configurar os endereços de origem confiáveis em `Piloto__ProxiesConfiaveis__0` e índices seguintes. Validar a origem real do proxy antes de disponibilizar o piloto. Sem HTTPS reconhecido, a aplicação recusa o acesso à interface e à API.
+
+Para publicar, ainda é preciso confirmar o repositório ou registro autorizado, acessar os painéis dos provedores e concluir os adaptadores de storage e e-mail e a persistência protegida das chaves de Data Protection. Validar o plano sem meio de pagamento em cada painel antes de criar recursos.
+
 ## Regras obrigatórias
 1. Confirmar planos gratuitos atuais diretamente nos provedores antes de provisionar.
 2. Não cadastrar cartão, habilitar faturamento, upgrade automático ou recurso pago sem aprovação explícita.

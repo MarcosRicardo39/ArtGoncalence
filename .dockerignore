@@ -1,0 +1,15 @@
+.git
+.agents
+.codex
+.aws
+**/node_modules
+**/.angular
+**/dist
+**/bin
+**/obj
+**/TestResults
+**/.env*
+**/*.pfx
+**/*.pem
+backend/tests
+Docs

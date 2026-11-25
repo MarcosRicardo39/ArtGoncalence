@@ -8,11 +8,20 @@ using ArtGoncalense.Application.Moderacao;
 using ArtGoncalense.Infrastructure.Imagens;
 using ArtGoncalense.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    foreach (var endereco in builder.Configuration.GetSection("Piloto:ProxiesConfiaveis").Get<string[]>() ?? [])
+    {
+        options.KnownProxies.Add(System.Net.IPAddress.Parse(endereco));
+    }
+});
 
 // Add services to the container.
 
@@ -74,6 +83,14 @@ builder.Services.AddDbContext<ArtGoncalenseDbContext>((services, options) =>
 });
 
 var app = builder.Build();
+var piloto = app.Configuration.GetValue<bool>("Piloto:Ativo");
+if (piloto)
+{
+    app.UseForwardedHeaders();
+    app.UseMiddleware<ArtGoncalense.API.AcessoPiloto>();
+    app.UseStaticFiles();
+}
+
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
@@ -91,6 +108,20 @@ app.UseRateLimiter();
 
 app.MapControllers();
 app.MapHealthChecks("/health").AllowAnonymous();
+if (piloto)
+{
+    app.MapFallback(async contexto =>
+    {
+        if (contexto.Request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase))
+        {
+            contexto.Response.StatusCode = StatusCodes.Status404NotFound;
+            return;
+        }
+
+        contexto.Response.ContentType = "text/html; charset=utf-8";
+        await contexto.Response.SendFileAsync(Path.Combine(app.Environment.WebRootPath, "index.html"));
+    });
+}
 
 app.Run();
 
