@@ -54,6 +54,7 @@ export class Galeria {
 })
 export class Ilustracao {
   private readonly api = inject(GaleriaApi);
+  readonly sessao = inject(ContaApi).sessao;
   readonly item = signal<IlustracaoPublica | null>(null);
   readonly buscando = signal(true);
   readonly erro = signal('');

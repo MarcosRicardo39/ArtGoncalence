@@ -4,8 +4,16 @@ import { Galeria, Ilustracao } from './galeria';
 import { Moderacao } from './moderacao';
 import { PerfilArtista } from './perfil';
 import { Publicar } from './publicar';
+import { Privacidade } from './privacidade';
 
 export const routes: Routes = [
+  { path: 'privacidade', component: Privacidade, title: 'Privacidade | ArtGoncalense' },
+  {
+    path: 'conta/privacidade',
+    component: Privacidade,
+    data: { solicitar: true },
+    title: 'Solicitar exclusão | ArtGoncalense',
+  },
   { path: '', pathMatch: 'full', component: Galeria, title: 'Galeria | ArtGoncalense' },
   { path: 'ilustracoes/:id', component: Ilustracao, title: 'Ilustração | ArtGoncalense' },
   { path: 'publicar', component: Publicar, title: 'Enviar ilustração | ArtGoncalense' },

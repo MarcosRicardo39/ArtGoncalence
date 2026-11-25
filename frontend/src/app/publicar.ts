@@ -20,7 +20,7 @@ export class Publicar {
   readonly carregando = signal(true);
   readonly enviando = signal(false);
   readonly selecionado = signal<File | null>(null);
-  readonly enviado = signal(false);
+  readonly enviado = signal<string | null>(null);
   readonly erro = signal('');
   readonly erroArquivo = signal('');
   readonly formulario = new FormGroup({
@@ -71,8 +71,8 @@ export class Publicar {
     formulario.append('categoria', dados.categoria);
     formulario.append('imagem', arquivo, arquivo.name);
     try {
-      await this.api.publicar(formulario);
-      this.enviado.set(true);
+      const { id } = await this.api.publicar(formulario);
+      this.enviado.set(id);
       this.selecionado.set(null);
       this.formulario.reset();
     } catch (erro) {

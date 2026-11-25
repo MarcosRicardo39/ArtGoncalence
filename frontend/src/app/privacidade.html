@@ -1,0 +1,101 @@
+<section class="perfil-layout">
+  @if (solicitar) {
+    <h1>Solicitar exclusão</h1>
+    <p><a routerLink="/privacidade">Política de privacidade</a></p>
+    @if (protocolo()) {
+      <div role="status">
+        <p>
+          Pedido registrado. Guarde o protocolo <strong>{{ protocolo() }}</strong>.
+        </p>
+        <p>Prazo para processamento de até 30 dias, observadas as obrigações de conservação.</p>
+      </div>
+    } @else if (sessao()) {
+      <form class="perfil-cartao" #pedido="ngForm" (ngSubmit)="enviar()">
+        <div class="campo">
+          <label for="escopo-exclusao">O que deseja excluir?</label>
+          <select
+            id="escopo-exclusao"
+            name="somenteObra"
+            [(ngModel)]="somenteObra"
+            [disabled]="enviando()"
+          >
+            <option [ngValue]="false">Minha conta e todas as minhas ilustrações</option>
+            <option [ngValue]="true">Uma das minhas ilustrações</option>
+          </select>
+        </div>
+        @if (somenteObra) {
+          <div class="campo">
+            <label for="obra-exclusao">Identificador da ilustração</label>
+            <input
+              id="obra-exclusao"
+              name="ilustracaoId"
+              [(ngModel)]="ilustracaoId"
+              maxlength="36"
+              required
+            />
+            <p>Encontre o identificador no comprovante de envio ou ao abrir a obra publicada.</p>
+          </div>
+        }
+        <p>
+          {{
+            somenteObra
+              ? 'A ilustração sai da galeria assim que você enviar o pedido.'
+              : 'Seu perfil e suas obras saem da galeria e sua sessão é encerrada assim que você enviar o pedido.'
+          }}
+        </p>
+        <div class="campo">
+          <label for="senha-exclusao">Confirme sua senha</label>
+          <input
+            id="senha-exclusao"
+            name="senha"
+            type="password"
+            autocomplete="current-password"
+            [(ngModel)]="senha"
+            maxlength="128"
+            required
+          />
+        </div>
+        <button class="botao principal" type="submit" [disabled]="pedido.invalid || enviando()">
+          {{ enviando() ? 'Enviando…' : 'Confirmar pedido de exclusão' }}
+        </button>
+      </form>
+    } @else {
+      <p>
+        <a routerLink="/conta/entrar">Entre na sua conta de artista</a> para solicitar exclusão.
+      </p>
+    }
+  } @else {
+    <h1>Política de privacidade</h1>
+    <p>
+      O ArtGoncalense é uma galeria de ilustrações. O cadastro é reservado a pessoas com 18 anos ou
+      mais.
+    </p>
+    <h2>Dados que usamos</h2>
+    <p>
+      Usamos seu e-mail, senha protegida por hash e cookies de sessão para autenticação e segurança.
+      A galeria exibe seu nome público, sua biografia, suas obras aprovadas e seu link de apoio,
+      quando informado.
+    </p>
+    <p>
+      A equipe usa o conteúdo das denúncias, inclusive o contato opcional, para analisar ocorrências
+      e tratar abusos. O contato é removido 90 dias após o encerramento, salvo conservação
+      justificada.
+    </p>
+    <h2>Exclusão e contato</h2>
+    <p>
+      Você pode solicitar a exclusão de uma obra ou de toda a conta. Ao receber o pedido, retiramos
+      da vista pública o conteúdo correspondente. O pedido é processado em até 30 dias, observadas
+      as obrigações de conservação.
+    </p>
+    <p><a routerLink="/conta/privacidade">Solicitar exclusão</a></p>
+    @if (email(); as contato) {
+      <p>
+        Para dúvidas ou outros pedidos sobre seus dados, escreva para
+        <a [href]="'mailto:' + contato">{{ contato }}</a>.
+      </p>
+    }
+  }
+  @if (erro()) {
+    <p class="mensagem erro" role="alert">{{ erro() }}</p>
+  }
+</section>

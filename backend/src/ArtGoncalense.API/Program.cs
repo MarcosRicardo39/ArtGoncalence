@@ -19,6 +19,7 @@ builder.Services.AddControllersWithViews(options => options.Filters.Add(new Auto
 builder.Services.AddProblemDetails();
 builder.AdicionarContas();
 builder.Services.AddScoped<ServicoPerfis>();
+builder.Services.AddScoped<Privacidade>();
 builder.Services.AddScoped<IRepositorioPerfis, RepositorioPerfis>();
 builder.Services.AddScoped<ServicoPublicacao>();
 builder.Services.AddScoped<IRepositorioPublicacoes, RepositorioPublicacoes>();

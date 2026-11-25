@@ -12,6 +12,7 @@
   @if (perfil(); as atual) {
     @if (editavel) {
       <p class="subtitulo">Escolha como seu nome e sua biografia aparecem para visitantes.</p>
+      <p><a routerLink="/conta/privacidade">Solicitar exclusão de conta ou ilustração</a></p>
       @if (sessao()?.emailConfirmado === false) {
         <div class="perfil-aviso">
           <div>

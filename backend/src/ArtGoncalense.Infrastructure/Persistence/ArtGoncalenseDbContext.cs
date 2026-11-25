@@ -14,6 +14,7 @@ public sealed class ArtGoncalenseDbContext(DbContextOptions<ArtGoncalenseDbConte
     public DbSet<Ilustracao> Ilustracoes => Set<Ilustracao>();
     public DbSet<Denuncia> Denuncias => Set<Denuncia>();
     public DbSet<AcaoModeracao> AcoesModeracao => Set<AcaoModeracao>();
+    public DbSet<PedidoExclusao> PedidosExclusao => Set<PedidoExclusao>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
@@ -23,6 +24,7 @@ public sealed class ArtGoncalenseDbContext(DbContextOptions<ArtGoncalenseDbConte
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<PedidoExclusao>().HasIndex(x => new { x.TitularId, x.ConcluidoEm });
 
         var usuario = modelBuilder.Entity<Usuario>();
         usuario.HasKey(x => x.Id);

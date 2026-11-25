@@ -18,6 +18,13 @@
         @if (obra.descricao) {
           <p class="biografia">{{ obra.descricao }}</p>
         }
+        @if (sessao()?.id === obra.artista.id) {
+          <p>
+            <a routerLink="/conta/privacidade" [queryParams]="{ ilustracao: obra.id }"
+              >Solicitar exclusão desta ilustração</a
+            >
+          </p>
+        }
       </div>
     </div>
   }

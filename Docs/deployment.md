@@ -26,3 +26,9 @@ Para a sessão da T05, validar o acesso do navegador ao frontend e a `/api` pela
 
 ## CI/CD planejado
 GitHub Actions: restore, build, testes e geração de artefatos; deploy somente após autorização e configuração segura de credenciais. Não inferir que o projeto anterior DocumentAI autoriza publicação deste novo projeto.
+
+## Operação de privacidade
+
+Antes da abertura pública, definir a pessoa responsável e configurar um endereço monitorado em `Privacidade__EmailContato`. Conferir a política na página `/privacidade`. Usar somente dados fictícios para validar este fluxo localmente.
+
+Revisar diariamente a fila administrativa e processar os pedidos até o prazo de 30 dias. Tratar os conflitos de conservação com a pessoa responsável, resolver denúncias abertas e documentar a justificativa antes de liberar registros. Executar diariamente a limpeza de contatos vencidos pela API administrativa. Definir retenção e restauração de backups de modo que dados excluídos não voltem à galeria após uma recuperação. Rotina e responsáveis devem estar definidos antes da abertura pública.

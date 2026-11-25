@@ -74,3 +74,12 @@ Aprovar ou rejeitar exige estado pendente. Ocultar exige estado aprovado. O serv
 `GET /api/moderacao/denuncias?page=1&pageSize=20` retorna `page`, `pageSize`, `total` e `itens`. Os itens são denúncias recebidas e incluem `id`, `ilustracaoId`, `motivo`, `descricao`, `contato` e `criadoEm`. O máximo de `pageSize` é 100. A fila exige sessão de Moderador ou Admin e é servida sem cache.
 
 `POST /api/moderacao/denuncias/{id}/encerrar` exige o mesmo papel, CSRF e `justificativa` obrigatória de até 2.000 caracteres. A API grava o estado `ENCERRADA`, a justificativa, o autor e a data. A visibilidade da ilustração continua sob controle das decisões de moderação.
+
+## Privacidade
+
+- `GET /api/privacidade` retorna `email`, que é nulo quando o endereço do canal ainda não foi configurado.
+- `POST /api/privacidade/exclusao` exige sessão de artista, CSRF e JSON com `senha` e `ilustracaoId` opcional. Omitir o ID solicita exclusão de toda a conta. O retorno `202` traz o protocolo no campo `id`. Senha incorreta retorna `403`. Uma obra indisponível para o artista retorna `404`.
+- `GET /api/privacidade/pedidos` exige Admin e lista até 100 pedidos pendentes, dos mais antigos aos mais recentes, com `id`, `titularId`, `ilustracaoId`, `solicitadoEm` e `limiteEm`.
+- `POST /api/privacidade/pedidos/{id}/processar` exige Admin e CSRF. Retorna `204` após concluir, inclusive em uma repetição, ou `409` se houver denúncia em aberto ou registros a conservar.
+- `POST /api/privacidade/contatos/limpar` exige Admin e CSRF e retorna a contagem `removidos` de contatos de denúncias encerradas há pelo menos 90 dias, descontadas as exceções registradas.
+- `PUT /api/privacidade/denuncias/{id}/conservacao` exige Admin e CSRF. Enviar `motivo` com até 500 caracteres registra a justificativa. Enviar `motivo: null` libera o contato para os prazos normais.

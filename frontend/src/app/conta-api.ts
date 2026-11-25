@@ -42,6 +42,10 @@ export class ContaApi {
 
   async sair(): Promise<void> {
     await this.enviar('sair', {});
+    this.limparSessao();
+  }
+
+  limparSessao(): void {
     this.estado.set(null);
     this.emailInformado = '';
   }

@@ -33,4 +33,5 @@ public sealed class Denuncia
     public Guid? EncerradaPorId { get; private set; }
     public DateTimeOffset? EncerradaEm { get; private set; }
     public string? JustificativaEncerramento { get; private set; }
+    public string? MotivoConservacaoContato { get; private set; }
 }

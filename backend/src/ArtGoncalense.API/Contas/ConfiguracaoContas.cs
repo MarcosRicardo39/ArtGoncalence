@@ -15,6 +15,7 @@ internal static class ConfiguracaoContas
     internal const string Login = "Login";
     internal const string Correio = "Correio";
     internal const string Codigo = "Codigo";
+    internal const string Exclusao = "Exclusao";
 
     public static void AdicionarContas(this WebApplicationBuilder builder)
     {
@@ -107,6 +108,7 @@ internal static class ConfiguracaoContas
             options.AddPolicy(Login, context => Particao(context, loginPorIp, janela));
             options.AddPolicy(Correio, context => Particao(context, correioPorIp, janela));
             options.AddPolicy(Codigo, context => Particao(context, loginPorIp, janela));
+            options.AddPolicy(Exclusao, context => Particao(context, loginPorIp, janela));
             options.AddPolicy(DenunciasController.PoliticaPorIp, context => ParticaoPorIp(context, 5, janela));
         });
     }

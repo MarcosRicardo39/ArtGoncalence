@@ -19,11 +19,17 @@
     </div>
   }
 
-  @if (enviado()) {
+  @if (enviado(); as id) {
     <div class="publicacao-pronta" role="status">
       <h2>Ilustração enviada</h2>
       <p>Ela está aguardando moderação e aparecerá na galeria se for aprovada.</p>
-      <button class="botao secundario" type="button" (click)="enviado.set(false)">
+      <p>Identificador da ilustração <strong>{{ id }}</strong></p>
+      <p>
+        <a routerLink="/conta/privacidade" [queryParams]="{ ilustracao: id }"
+          >Solicitar exclusão desta ilustração</a
+        >
+      </p>
+      <button class="botao secundario" type="button" (click)="enviado.set(null)">
         Enviar outra
       </button>
     </div>

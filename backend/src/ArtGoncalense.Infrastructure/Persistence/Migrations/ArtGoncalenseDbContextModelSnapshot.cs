@@ -83,6 +83,9 @@ namespace ArtGoncalense.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("MotivoConservacaoContato")
+                        .HasColumnType("text");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
@@ -169,6 +172,31 @@ namespace ArtGoncalense.Infrastructure.Persistence.Migrations
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("LinksApoio");
+                });
+
+            modelBuilder.Entity("ArtGoncalense.Domain.PedidoExclusao", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("ConcluidoEm")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("IlustracaoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("SolicitadoEm")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("TitularId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TitularId", "ConcluidoEm");
+
+                    b.ToTable("PedidosExclusao");
                 });
 
             modelBuilder.Entity("ArtGoncalense.Domain.Usuario", b =>
