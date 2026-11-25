@@ -37,14 +37,19 @@ Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). A
 | GET | `/api/ilustracoes/{id}` | Público | 200 para ilustração aprovada com artista disponível, ou 404 |
 | GET | `/api/ilustracoes/{id}/imagem` | Público | 200 com WebP da ilustração aprovada, ou 404 |
 | POST | `/api/ilustracoes` | Artista confirmado | 201 com status PENDENTE |
-| DELETE | `/api/ilustracoes/{id}` | Titular ou moderador | 204 |
+| POST | `/api/privacidade/exclusao` | Artista titular, com CSRF e confirmação de senha | 202 com protocolo. Enviar o ID para excluir uma ilustração ou omitir o ID para excluir a conta. |
 | POST | `/api/ilustracoes/{id}/denuncias` | Público, com CSRF e limite por IP | 202, 404 para ilustração inexistente ou fora do estado aprovado, 429 acima do limite |
 | GET | `/api/moderacao/pendentes` | Moderador ou administrador | 200 com fila paginada |
 | GET | `/api/moderacao/{id}/imagem` | Moderador ou administrador | 200 com WebP privado de ilustração pendente ou aprovada, ou 404 |
 | POST | `/api/moderacao/{id}/decisao` | Moderador ou administrador, com CSRF | 204 em caso de sucesso, 409 se o estado não permitir a decisão |
 | GET | `/api/moderacao/denuncias` | Moderador ou administrador | 200 com fila privada paginada de denúncias recebidas |
 | POST | `/api/moderacao/denuncias/{id}/encerrar` | Moderador ou administrador, com CSRF | 204 em caso de sucesso, 404 para denúncia inexistente, 409 se já encerrada |
-| GET | `/health` | Operacional | 200/503 |
+| GET | `/api/privacidade` | Público | 200 com o endereço configurado para contato de privacidade |
+| GET | `/api/privacidade/pedidos` | Administrador | 200 com a fila de exclusão |
+| POST | `/api/privacidade/pedidos/{id}/processar` | Administrador, com CSRF | 204 ao concluir, 409 quando há registros sujeitos a conservação |
+| POST | `/api/privacidade/contatos/limpar` | Administrador, com CSRF | 200 com o total de contatos removidos |
+| PUT | `/api/privacidade/denuncias/{id}/conservacao` | Administrador, com CSRF | 204 ao registrar ou liberar a conservação |
+| GET | `/health` | Público | 200 com conexão ao PostgreSQL disponível ou 503 se indisponível |
 
 ## 5. Validação e erros
 - 400: campos ou arquivo inválidos.
@@ -73,3 +78,16 @@ Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). A
 
 ## 7. Casos de teste essenciais
 CT-01 cadastro válido; CT-02 e-mail duplicado; CT-03 senha inválida; CT-04 login inválido; CT-05 publicação sem confirmação; CT-06 upload válido; CT-07 formato falso/arquivo inválido; CT-08 imagem acima do limite; CT-09 sexta imagem; CT-10 disputa simultânea pelo limite; CT-11 acesso cruzado a recursos; CT-12 moderação aprova; CT-13 moderação rejeita; CT-14 ocultação após denúncia; CT-15 paginação; CT-16 URL externa maliciosa; CT-17 exclusão e limpeza de storage; CT-18 rate limiting; CT-19 health check.
+
+| Cenários | Suíte xUnit |
+|---|---|
+| CT-01 a CT-04 | `ContasTests.cs` verifica cadastro, duplicidade, senha inválida e login inválido. |
+| CT-05 a CT-10 | `PublicacoesTests.cs` verifica confirmação, upload válido, rejeição por tipo e tamanho, limite de cinco e concorrência. |
+| CT-11 | `ApoioTests.cs` e `PrivacidadeTests.cs` verificam titularidade e autorização administrativa. |
+| CT-12 e CT-13 | `ModeracaoTests.cs` verifica aprovação e rejeição com trilha de auditoria. |
+| CT-14 | `DenunciasTests.cs` verifica denúncia, encerramento, ocultação e retirada da imagem pública. |
+| CT-15 | `GaleriaTests.cs` verifica a paginação e a visibilidade das ilustrações. |
+| CT-16 | `ApoioTests.cs` verifica a validação dos destinos de links externos. |
+| CT-17 | `PrivacidadeTests.cs` verifica exclusão e remoção de arquivos armazenados. |
+| CT-18 | `ContasTests.cs` e `DenunciasTests.cs` verificam bloqueios e respostas de limite. |
+| CT-19 | `SaudeTests.cs` verifica `200` com banco acessível e `503` com banco indisponível. |

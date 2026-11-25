@@ -104,6 +104,13 @@ public sealed partial class ApiTests
         Assert.Equal(StatusIlustracao.Aprovada,
             (await db.Ilustracoes.AsNoTracking().SingleAsync(x => x.Id == aprovada)).Status);
         Assert.False(await db.Denuncias.AnyAsync(x => x.IlustracaoId == pendente));
+
+        using var ocultacao = await DecidirAsync(moderador, aprovada, "OCULTAR");
+        Assert.Equal(HttpStatusCode.NoContent, ocultacao.StatusCode);
+        using var detalheOculto = await visitante.GetAsync($"/api/ilustracoes/{aprovada}");
+        using var imagemOculta = await visitante.GetAsync($"/api/ilustracoes/{aprovada}/imagem");
+        Assert.Equal(HttpStatusCode.NotFound, detalheOculto.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, imagemOculta.StatusCode);
     }
 
     [PostgreSqlFact]

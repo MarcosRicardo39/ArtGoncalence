@@ -1,14 +1,14 @@
 # Documentação da API — ArtGoncalense
 
 ## Estado
-As rotas de contas, perfis, criação e consulta pública de ilustrações, moderação e denúncias estão implementadas. Os demais caminhos de [specifications.md](specifications.md) são contratos propostos.
+As rotas de contas, perfis, ilustrações, moderação, denúncias, privacidade e saúde estão implementadas. A aplicação serve a descrição OpenAPI em `GET /openapi/v1.json` no ambiente de desenvolvimento.
 
 ## Convenções
 - Base: `/api` para recursos de negócio; `/health` para saúde.
-- Transporte HTTPS e JSON; upload via `multipart/form-data`.
+- Transporte HTTPS e JSON, com upload via `multipart/form-data` e respostas de imagem em WebP.
 - Campos de negócio em português. Campos padronizados de Problem Details preservados.
-- Documentar autenticação, respostas e exemplos no OpenAPI/Scalar ou Swagger.
-- Paginação com `page` e `pageSize`, limite máximo configurável.
+- A descrição OpenAPI lista rotas e esquemas. Regras de autenticação, respostas e exemplos constam neste documento.
+- Paginação com `page` e `pageSize`, com limite de 100 itens por página nas rotas paginadas.
 - Erros padronizados em Problem Details com `traceId`, sem dados sensíveis.
 
 ## Contas
@@ -26,6 +26,8 @@ Obtenha os cookies com `GET /api/contas/csrf` e envie o valor do cookie legível
 | `sair` | Corpo dispensável |
 
 Para cadastro e redefinição, a senha aceita de 15 a 128 caracteres, sem classes de caracteres obrigatórias. Solicitações válidas de cadastro, reenvio e recuperação retornam `202` com a mesma mensagem, inclusive quando o envio é suprimido. Ao exceder o limite por IP a API retorna `429`. Em ambiente sem transporte de e-mail, as três operações de envio retornam `503`.
+
+O login retorna `200` com cookie de sessão ou `401` com mensagem genérica. `GET /api/contas/sessao` retorna `id` e `emailConfirmado` para a sessão autenticada. Confirmação de e-mail, redefinição de senha e saída retornam `204` quando bem-sucedidas.
 
 ## Perfis de artista
 
@@ -83,3 +85,7 @@ Aprovar ou rejeitar exige estado pendente. Ocultar exige estado aprovado. O serv
 - `POST /api/privacidade/pedidos/{id}/processar` exige Admin e CSRF. Retorna `204` após concluir, inclusive em uma repetição, ou `409` se houver denúncia em aberto ou registros a conservar.
 - `POST /api/privacidade/contatos/limpar` exige Admin e CSRF e retorna a contagem `removidos` de contatos de denúncias encerradas há pelo menos 90 dias, descontadas as exceções registradas.
 - `PUT /api/privacidade/denuncias/{id}/conservacao` exige Admin e CSRF. Enviar `motivo` com até 500 caracteres registra a justificativa. Enviar `motivo: null` libera o contato para os prazos normais.
+
+## Saúde
+
+`GET /health` verifica a conexão da aplicação com o PostgreSQL sem exigir sessão. Retorna `200` com `Healthy` ou `503` com `Unhealthy`, em texto simples. O corpo omite detalhes de diagnóstico.

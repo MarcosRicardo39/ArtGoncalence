@@ -10,6 +10,7 @@ using ArtGoncalense.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +60,7 @@ builder.Services.AddSingleton<IArmazenamentoImagens>(services => services.GetReq
 builder.Services.AddScoped<ReconciliadorImagens>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddHealthChecks().AddCheck<SaudePostgreSql>("postgresql", timeout: TimeSpan.FromSeconds(5));
 builder.Services.AddDbContext<ArtGoncalenseDbContext>((services, options) =>
 {
     var configuration = services.GetRequiredService<IConfiguration>();
@@ -88,7 +90,17 @@ app.UseAuthorization();
 app.UseRateLimiter();
 
 app.MapControllers();
+app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();
 
 public partial class Program;
+
+internal sealed class SaudePostgreSql(ArtGoncalenseDbContext db) : IHealthCheck
+{
+    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+        CancellationToken cancellationToken = default) =>
+        await db.Database.CanConnectAsync(cancellationToken)
+            ? HealthCheckResult.Healthy()
+            : HealthCheckResult.Unhealthy();
+}
