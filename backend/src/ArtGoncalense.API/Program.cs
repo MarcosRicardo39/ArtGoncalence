@@ -1,4 +1,5 @@
 using ArtGoncalense.API.Contas;
+using ArtGoncalense.API;
 using ArtGoncalense.API.Ilustracoes;
 using ArtGoncalense.Application.Artistas;
 using ArtGoncalense.Application.Denuncias;
@@ -14,6 +15,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
+if (!builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Piloto:Ativo"))
+{
+    builder.Services.AdicionarProtecaoPiloto(builder.Configuration["Piloto:CertificadoProtecao"]);
+}
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;

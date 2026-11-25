@@ -30,7 +30,7 @@ O `Dockerfile` compila o Angular e a API e executa o contêiner na porta 10000 c
 
 Configurar `Piloto__Senha` no painel de segredos com um valor aleatório independente. O usuário da credencial de entrada é `piloto`. Quando TLS terminar no proxy, configurar os endereços de origem confiáveis em `Piloto__ProxiesConfiaveis__0` e índices seguintes. Validar a origem real do proxy antes de disponibilizar o piloto. Sem HTTPS reconhecido, a aplicação recusa o acesso à interface e à API.
 
-Para publicar, validar as integrações com os provedores e concluir a persistência protegida das chaves de Data Protection. Validar o plano sem meio de pagamento em cada painel antes de criar recursos.
+Para publicar, validar as integrações com os provedores e o proxy confiável. Validar o plano sem meio de pagamento em cada painel antes de criar recursos.
 
 ### Configuração das integrações no Render
 
@@ -45,6 +45,12 @@ Para publicar, validar as integrações com os provedores e concluir a persistê
 Usar o bucket privado `ilustracoes`. A API lê os objetos pela rota autenticada do Storage e verifica a visibilidade da publicação antes de entregá-los. O adaptador grava WebP otimizado com nome aleatório e envia a exclusão ao Storage. A reconciliação local continua restrita ao armazenamento em disco. No piloto, verificar objetos sem referência antes da abertura e definir a rotina de reconciliação sem remover objetos recentes.
 
 O transporte Brevo envia códigos de confirmação e redefinição somente para a lista do piloto e mantém a resposta de cadastro uniforme. Testar a entrega e a recuperação de senha com uma conta autorizada e confirmar a privacidade do bucket com uma tentativa de leitura sem credencial. [Chaves do Supabase](https://supabase.com/docs/guides/getting-started/api-keys) e [API transacional Brevo](https://developers.brevo.com/reference/send-transac-email).
+
+### Chaves de sessão do piloto
+
+Aplicar a migração `ChavesProtecaoPiloto` antes de iniciar o contêiner. A tabela `ChavesProtecao` usa RLS sem políticas públicas. O app grava as chaves de Data Protection no PostgreSQL, criptografadas com um certificado RSA de uso exclusivo do piloto. Configurar um PKCS#12 com chave privada, codificado em Base64, em `Piloto__CertificadoProtecao` no painel de segredos do Render.
+
+Usar o mesmo certificado em novos deploys e manter uma cópia protegida separada do backup do banco. Uma troca sem acesso ao certificado anterior invalida as sessões e os códigos emitidos antes da troca. Testar login e confirmação após reinício e confirmar que a coluna XML contém material criptografado. [Configuração de Data Protection](https://learn.microsoft.com/en-us/aspnet/core/security/data-protection/configuration/overview?view=aspnetcore-10.0).
 
 ## Regras obrigatórias
 1. Confirmar planos gratuitos atuais diretamente nos provedores antes de provisionar.

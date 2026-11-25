@@ -15,6 +15,7 @@ public sealed class ArtGoncalenseDbContext(DbContextOptions<ArtGoncalenseDbConte
     public DbSet<Denuncia> Denuncias => Set<Denuncia>();
     public DbSet<AcaoModeracao> AcoesModeracao => Set<AcaoModeracao>();
     public DbSet<PedidoExclusao> PedidosExclusao => Set<PedidoExclusao>();
+    public DbSet<ChaveProtecao> ChavesProtecao => Set<ChaveProtecao>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
