@@ -29,11 +29,33 @@ internal static class ConfiguracaoContas
 
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton(sp => new LimiteEnvioConta(enviosPorEmail, sp.GetRequiredService<TimeProvider>()));
-        services.AddSingleton(sp => new EnvioLocalContas(
-            sp.GetRequiredService<IWebHostEnvironment>().IsDevelopment()
-                ? sp.GetRequiredService<IConfiguration>()["Contas:DiretorioEmailLocal"]
-                : null,
-            sp.GetRequiredService<ILogger<EnvioLocalContas>>()));
+        services.AddHttpClient("Brevo", client =>
+        {
+            client.BaseAddress = new Uri("https://api.brevo.com/");
+            client.Timeout = TimeSpan.FromSeconds(10);
+        }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+        services.AddScoped<IEnvioContas>(sp =>
+        {
+            if (sp.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+            {
+                return new EnvioLocalContas(config["Contas:DiretorioEmailLocal"],
+                    sp.GetRequiredService<ILogger<EnvioLocalContas>>());
+            }
+
+            var remetente = config["Contas:Brevo:Remetente"];
+            var chave = config["Contas:Brevo:Chave"];
+            var destinatarios = (config.GetSection("Contas:Brevo:Destinatarios").Get<string[]>() ?? [])
+                .Select(email => email.Trim()).Where(EnderecoValido).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var http = sp.GetRequiredService<IHttpClientFactory>().CreateClient("Brevo");
+            if (!string.IsNullOrWhiteSpace(chave))
+            {
+                http.DefaultRequestHeaders.Add("api-key", chave);
+            }
+
+            return new EnvioBrevoContas(http,
+                !string.IsNullOrWhiteSpace(chave) && EnderecoValido(remetente) ? remetente : null,
+                destinatarios, sp.GetRequiredService<ILogger<EnvioBrevoContas>>());
+        });
         services.AddScoped<IServicoContas, ServicoContas>();
         services.AddIdentityCore<ContaIdentity>(options =>
         {
@@ -148,4 +170,7 @@ internal static class ConfiguracaoContas
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(valor, nome);
         return valor;
     }
+
+    private static bool EnderecoValido(string? valor) =>
+        System.Net.Mail.MailAddress.TryCreate(valor, out var endereco) && endereco.Address == valor;
 }

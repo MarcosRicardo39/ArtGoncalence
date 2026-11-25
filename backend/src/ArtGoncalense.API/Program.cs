@@ -65,7 +65,27 @@ builder.Services.AddSingleton<ArmazenamentoImagensLocal>(services =>
 
     return new ArmazenamentoImagensLocal(raiz);
 });
-builder.Services.AddSingleton<IArmazenamentoImagens>(services => services.GetRequiredService<ArmazenamentoImagensLocal>());
+builder.Services.AddHttpClient<ArmazenamentoSupabase>((services, client) =>
+{
+    var config = services.GetRequiredService<IConfiguration>();
+    var chave = config["Imagens:Supabase:Chave"];
+    if (!Uri.TryCreate(config["Imagens:Supabase:Url"], UriKind.Absolute, out var url)
+        || url.Scheme != Uri.UriSchemeHttps || !url.IsDefaultPort || url.PathAndQuery != "/"
+        || url.Fragment.Length != 0 || url.UserInfo.Length != 0
+        || !url.Host.EndsWith(".supabase.co", StringComparison.OrdinalIgnoreCase)
+        || string.IsNullOrWhiteSpace(chave) || !chave.StartsWith("sb_secret_", StringComparison.Ordinal))
+    {
+        throw new InvalidOperationException("Configure a URL e a chave secreta de Storage do Supabase.");
+    }
+
+    client.BaseAddress = url;
+    client.Timeout = TimeSpan.FromSeconds(15);
+    client.DefaultRequestHeaders.Add("apikey", chave);
+}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
+builder.Services.AddScoped<IArmazenamentoImagens>(services =>
+    services.GetRequiredService<IWebHostEnvironment>().IsDevelopment()
+        ? services.GetRequiredService<ArmazenamentoImagensLocal>()
+        : services.GetRequiredService<ArmazenamentoSupabase>());
 builder.Services.AddScoped<ReconciliadorImagens>();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();

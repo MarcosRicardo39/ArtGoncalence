@@ -19,7 +19,7 @@ Cloudflare Pages permanece uma opção para os arquivos estáticos. Com uma API 
 
 1. Confirmar as cotas e a ausência de meio de pagamento no painel dos provedores. Provisionar apenas após autorização explícita. Manter o ambiente limitado aos participantes do teste, usar dados fictícios e deixar o cadastro público fechado. Validar o bloqueio também na URL direta do backend.
 2. Preparar empacotamento Angular + ASP.NET Core para Linux, usando a porta do ambiente e fallback do Angular apenas para rotas da interface. Servir `/health` pelo backend. Validar inicialização a frio, timeout e consumo de memória com imagens próximas aos limites de entrada.
-3. Implementar e validar o adaptador de storage privado e o transporte de e-mail HTTPS. Hoje o backend só oferece armazenamento e correio locais em desenvolvimento. Confirmar operações de gravação, leitura, exclusão e reconciliação, com credenciais apenas no servidor e teste de e-mail limitado aos participantes.
+3. Configurar e validar os adaptadores de storage privado e e-mail HTTPS. Confirmar gravação, leitura, exclusão e reconciliação, com credenciais apenas no servidor e teste de e-mail limitado aos participantes. Em desenvolvimento, manter armazenamento e correio locais.
 4. Persistir e proteger as chaves de Data Protection fora do disco efêmero. Verificar sessão, confirmação e recuperação de senha após reinício. Aplicar cabeçalhos encaminhados apenas de proxies confiáveis e testar a origem do IP usado pelos limites. Rever cookies e CSRF sob HTTPS, assim como as permissões de artista, moderador e administrador.
 5. Aplicar migrations explicitamente com credencial separada da aplicação. Antes de cada migração, exportar o PostgreSQL e copiar os objetos privados com inventário de chaves. Fazer exportações periódicas durante o piloto e guardar tudo em local criptografado com acesso restrito. Testar restauração isolada do dump e dos objetos, verificando que pedidos de exclusão já concluídos sejam respeitados antes de reabrir o ambiente. A exportação do banco não contém os arquivos de Storage. [Backups Supabase](https://supabase.com/docs/guides/platform/backups).
 6. Acompanhar os painéis de uso. Como margem inicial do piloto, revisar consumo ao atingir 70% de banda, armazenamento ou cota de e-mail e pausar novos envios a partir de 85% se não houver margem para concluir o teste. Se um deploy falhar, retomar a versão anterior compatível com o esquema, verificar `/health` e repetir os fluxos de sessão, galeria e exclusão antes de liberar o acesso aos participantes.
@@ -30,7 +30,21 @@ O `Dockerfile` compila o Angular e a API e executa o contêiner na porta 10000 c
 
 Configurar `Piloto__Senha` no painel de segredos com um valor aleatório independente. O usuário da credencial de entrada é `piloto`. Quando TLS terminar no proxy, configurar os endereços de origem confiáveis em `Piloto__ProxiesConfiaveis__0` e índices seguintes. Validar a origem real do proxy antes de disponibilizar o piloto. Sem HTTPS reconhecido, a aplicação recusa o acesso à interface e à API.
 
-Para publicar, ainda é preciso confirmar o repositório ou registro autorizado, acessar os painéis dos provedores e concluir os adaptadores de storage e e-mail e a persistência protegida das chaves de Data Protection. Validar o plano sem meio de pagamento em cada painel antes de criar recursos.
+Para publicar, validar as integrações com os provedores e concluir a persistência protegida das chaves de Data Protection. Validar o plano sem meio de pagamento em cada painel antes de criar recursos.
+
+### Configuração das integrações no Render
+
+| Variável | Valor a configurar |
+|---|---|
+| `Imagens__Supabase__Url` | URL HTTPS do projeto, sem caminho adicional. |
+| `Imagens__Supabase__Chave` | Chave secreta de servidor `sb_secret_…` de um projeto dedicado ao piloto. Manter apenas no painel do Render. |
+| `Contas__Brevo__Chave` | Chave de API Brevo com permissão de envio transacional. |
+| `Contas__Brevo__Remetente` | Endereço de remetente verificado no Brevo. |
+| `Contas__Brevo__Destinatarios__0` | Primeiro endereço autorizado a receber e-mails no piloto. Use índices seguintes para outros participantes. |
+
+Usar o bucket privado `ilustracoes`. A API lê os objetos pela rota autenticada do Storage e verifica a visibilidade da publicação antes de entregá-los. O adaptador grava WebP otimizado com nome aleatório e envia a exclusão ao Storage. A reconciliação local continua restrita ao armazenamento em disco. No piloto, verificar objetos sem referência antes da abertura e definir a rotina de reconciliação sem remover objetos recentes.
+
+O transporte Brevo envia códigos de confirmação e redefinição somente para a lista do piloto e mantém a resposta de cadastro uniforme. Testar a entrega e a recuperação de senha com uma conta autorizada e confirmar a privacidade do bucket com uma tentativa de leitura sem credencial. [Chaves do Supabase](https://supabase.com/docs/guides/getting-started/api-keys) e [API transacional Brevo](https://developers.brevo.com/reference/send-transac-email).
 
 ## Regras obrigatórias
 1. Confirmar planos gratuitos atuais diretamente nos provedores antes de provisionar.

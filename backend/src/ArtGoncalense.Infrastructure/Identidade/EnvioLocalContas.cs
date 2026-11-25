@@ -3,11 +3,13 @@ using Microsoft.Extensions.Logging;
 
 namespace ArtGoncalense.Infrastructure.Identidade;
 
-public sealed class EnvioLocalContas(string? diretorio, ILogger<EnvioLocalContas> logger)
+public sealed class EnvioLocalContas(string? diretorio, ILogger<EnvioLocalContas> logger) : IEnvioContas
 {
     public bool Disponivel => !string.IsNullOrWhiteSpace(diretorio);
 
-    internal async Task EnviarAsync(string email, string finalidade, string codigo, CancellationToken cancellationToken)
+    public bool PermiteDestinatario(string email) => Disponivel;
+
+    public async Task EnviarAsync(string email, string finalidade, string codigo, CancellationToken cancellationToken)
     {
         if (!Disponivel)
         {

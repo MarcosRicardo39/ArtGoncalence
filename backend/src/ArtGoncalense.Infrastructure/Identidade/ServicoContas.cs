@@ -13,7 +13,7 @@ public sealed class ServicoContas(
     UserManager<ContaIdentity> contas,
     SignInManager<ContaIdentity> sessoes,
     LimiteEnvioConta limiteEnvio,
-    EnvioLocalContas envio,
+    IEnvioContas envio,
     TimeProvider relogio) : IServicoContas
 {
     private static readonly ContaIdentity ContaSimulada = new();
@@ -26,6 +26,11 @@ public sealed class ServicoContas(
     public async Task<bool> RegistrarAsync(
         string email, string senha, string nomePublico, CancellationToken cancellationToken)
     {
+        if (!envio.PermiteDestinatario(email))
+        {
+            return true;
+        }
+
         if (await contas.FindByEmailAsync(email) is not null)
         {
             HasherSimulado.VerifyHashedPassword(ContaSimulada, HashSimulado, senha);

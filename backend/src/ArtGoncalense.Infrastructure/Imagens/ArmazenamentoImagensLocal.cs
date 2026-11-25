@@ -22,8 +22,7 @@ public sealed class ArmazenamentoImagensLocal : IArmazenamentoImagens
     {
         cancellationToken.ThrowIfCancellationRequested();
         var dados = imagem.Bytes;
-        if (dados.Length is < 12 or > LimitesImagem.SaidaBytes
-            || !dados.AsSpan(0, 4).SequenceEqual("RIFF"u8) || !dados.AsSpan(8, 4).SequenceEqual("WEBP"u8))
+        if (!WebpValido(dados))
         {
             throw new ArgumentException("O armazenamento aceita apenas WebP otimizado.", nameof(imagem));
         }
@@ -133,7 +132,11 @@ public sealed class ArmazenamentoImagensLocal : IArmazenamentoImagens
         return Path.Combine(diretorio, chave);
     }
 
-    private static bool ChaveValida(string chave) =>
+    internal static bool WebpValido(ReadOnlySpan<byte> dados) =>
+        dados.Length is >= 12 and <= LimitesImagem.SaidaBytes
+        && dados[..4].SequenceEqual("RIFF"u8) && dados.Slice(8, 4).SequenceEqual("WEBP"u8);
+
+    internal static bool ChaveValida(string chave) =>
         chave.Length == 32 + Extensao.Length && chave.EndsWith(Extensao, StringComparison.Ordinal)
         && Guid.TryParseExact(chave.AsSpan(0, 32), "N", out var id)
         && string.Equals(chave, id.ToString("N") + Extensao, StringComparison.Ordinal);
