@@ -11,6 +11,7 @@ export interface Perfil {
   id: string;
   nomePublico: string;
   bio: string | null;
+  apoio?: { provedor: string; url: string };
 }
 
 @Injectable({ providedIn: 'root' })
@@ -55,6 +56,10 @@ export class ContaApi {
 
   editarPerfil(nomePublico: string, bio: string | null): Promise<void> {
     return this.mutarComCsrf('PUT', '/api/artistas/me', { nomePublico, bio });
+  }
+
+  definirApoio(url: string | null): Promise<void> {
+    return this.mutarComCsrf('PUT', '/api/artistas/me/apoio', { url });
   }
 
   async mutarComCsrf<T = void>(metodo: 'POST' | 'PUT', url: string, body: object): Promise<T> {

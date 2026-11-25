@@ -385,6 +385,22 @@ form {
   justify-items: start;
   gap: 1.15rem;
 }
+.apoio-cartao {
+  margin-top: 1rem;
+}
+.apoio-cartao h2 {
+  margin-bottom: 1rem;
+  font: 400 1.8rem/1.12 var(--serifa);
+  letter-spacing: -0.035em;
+}
+.apoio-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+.apoio-acoes .botao {
+  margin-top: 0;
+}
 .perfil-cartao form .botao {
   justify-self: start;
 }

@@ -34,9 +34,31 @@ public sealed class ArtistasController(ServicoPerfis perfis) : ControllerBase
             ? NoContent()
             : NotFound();
     }
+
+    [Authorize(Roles = AcessoConta.PapelArtista)]
+    [HttpPut("me/apoio")]
+    [RequestSizeLimit(4096)]
+    public async Task<IActionResult> DefinirApoio(EdicaoApoio dados, CancellationToken cancellationToken)
+    {
+        if (!Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var titularId))
+        {
+            return Forbid();
+        }
+
+        return (await perfis.DefinirApoioAsync(titularId, dados.Url, cancellationToken)) switch
+        {
+            ResultadoApoio.UrlInvalida => Problem(statusCode: 400,
+                title: "Use um link direto como https://ko-fi.com/seuperfil."),
+            ResultadoApoio.ArtistaIndisponivel => NotFound(),
+            _ => NoContent()
+        };
+    }
 }
 
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed record EdicaoPerfil(
     [Required, MaxLength(200)] string NomePublico,
     [MaxLength(2000)] string? Bio);
+
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
+public sealed record EdicaoApoio([property: JsonRequired] [MaxLength(256)] string? Url);

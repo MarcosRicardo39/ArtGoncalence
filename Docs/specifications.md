@@ -32,6 +32,7 @@ Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). A
 | POST | `/api/contas/redefinir-senha` | Público | 204 ou 400 genérico para código inválido ou expirado |
 | GET | `/api/artistas/{id}` | Público | 200 com `id`, `nomePublico` e `bio`, ou 404 |
 | PUT | `/api/artistas/me` | Artista titular, com CSRF | 204 em caso de sucesso |
+| PUT | `/api/artistas/me/apoio` | Artista titular, com CSRF | 204 para cadastrar, substituir ou remover o link, 400 para URL inválida |
 | GET | `/api/ilustracoes?page=1&pageSize=20` | Público | 200, apenas aprovadas |
 | GET | `/api/ilustracoes/{id}` | Público | 200 para ilustração aprovada com artista disponível, ou 404 |
 | GET | `/api/ilustracoes/{id}/imagem` | Público | 200 com WebP da ilustração aprovada, ou 404 |

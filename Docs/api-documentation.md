@@ -29,9 +29,11 @@ Para cadastro e redefinição, a senha aceita de 15 a 128 caracteres, sem classe
 
 ## Perfis de artista
 
-`GET /api/artistas/{id}` é público e retorna `id`, `nomePublico` e `bio`, que pode ser `null`. Retorna `404` para perfis inexistentes, suspensos ou de usuários sem o papel de artista.
+`GET /api/artistas/{id}` é público e retorna `id`, `nomePublico` e `bio`, que pode ser `null`. Se houver link ativo e válido, inclui `apoio` com `provedor` e `url`. Retorna `404` para perfis inexistentes, suspensos ou de usuários sem o papel de artista.
 
-`PUT /api/artistas/me` usa o identificador do artista autenticado. Envie `nomePublico` obrigatório, com até 200 caracteres, e `bio` opcional, com até 2.000 caracteres. Uma biografia ausente, nula ou em branco limpa o valor. Propriedades adicionais resultam em `400`. A atualização bem-sucedida retorna `204`. Avatar depende da definição de imagens e storage, e links de apoio serão tratados na T14.
+`PUT /api/artistas/me` usa o identificador do artista autenticado. Envie `nomePublico` obrigatório, com até 200 caracteres, e `bio` opcional, com até 2.000 caracteres. Uma biografia ausente, nula ou em branco limpa o valor. Propriedades adicionais resultam em `400`. A atualização bem-sucedida retorna `204`. Avatar depende da integração de imagens ao perfil.
+
+`PUT /api/artistas/me/apoio` usa o mesmo titular e exige CSRF. Envie JSON com `url` como um link direto `https://ko-fi.com/seuperfil` ou como `null` para remover. A regra aceita um identificador alfanumérico ASCII com sublinhados, de até 64 caracteres. Subdomínios, portas explícitas, parâmetros, fragmentos, trechos escapados e caminhos adicionais são recusados. A API valida o formato localmente e retorna `204` para a atualização, ou `400` para dados inválidos.
 
 ## Publicação de ilustração
 

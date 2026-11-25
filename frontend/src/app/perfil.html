@@ -73,12 +73,64 @@
           </button>
         </form>
       </div>
+      <section class="perfil-cartao apoio-cartao" aria-labelledby="titulo-apoio">
+        <h2 id="titulo-apoio">Link de apoio</h2>
+        <form (submit)="$event.preventDefault(); salvarApoio()" novalidate>
+          <div class="campo">
+            <label for="url-apoio">Perfil no Ko-fi</label>
+            <input
+              id="url-apoio"
+              type="url"
+              [formControl]="linkApoio"
+              maxlength="256"
+              placeholder="https://ko-fi.com/seuperfil"
+              autocomplete="url"
+              aria-describedby="url-apoio-dica url-apoio-erro"
+              [attr.aria-invalid]="linkApoio.touched && linkApoio.invalid"
+            />
+            <span id="url-apoio-dica" class="campo-dica"
+              >O botão no seu perfil público abre o Ko-fi.</span
+            >
+            <span id="url-apoio-erro" class="campo-erro">
+              @if (linkApoio.touched && linkApoio.invalid) {
+                Informe o link do seu perfil.
+              }
+            </span>
+          </div>
+          @if (erroApoio()) {
+            <p class="mensagem erro" role="alert">{{ erroApoio() }}</p>
+          }
+          @if (avisoApoio()) {
+            <p class="mensagem sucesso" role="status">{{ avisoApoio() }}</p>
+          }
+          <div class="apoio-acoes">
+            <button class="botao principal" type="submit" [disabled]="salvandoApoio()">
+              Salvar link
+            </button>
+            @if (atual.apoio) {
+              <button
+                class="botao secundario"
+                type="button"
+                [disabled]="salvandoApoio()"
+                (click)="salvarApoio(true)"
+              >
+                Remover link
+              </button>
+            }
+          </div>
+        </form>
+      </section>
     } @else {
       <div class="perfil-cartao publico">
         <span class="avatar grande" aria-hidden="true">{{ iniciais(atual.nomePublico) }}</span>
         <h1>{{ atual.nomePublico }}</h1>
         @if (atual.bio) {
           <p class="biografia">{{ atual.bio }}</p>
+        }
+        @if (atual.apoio; as apoio) {
+          <a class="botao principal" [href]="apoio.url" target="_blank" rel="noopener noreferrer">
+            Apoiar via {{ apoio.provedor }}
+          </a>
         }
         @if (sessao()?.id === atual.id) {
           <a class="botao secundario" routerLink="/conta/perfil">Editar meu perfil</a>

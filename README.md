@@ -62,6 +62,8 @@ Na interface Angular, abra `/conta/cadastro`, use um e-mail fictício e copie o 
 
 A página inicial exibe a galeria pública. Com e-mail confirmado, abra `/publicar` para enviar uma ilustração à moderação. Depois da aprovação, ela aparece na galeria com um link para o perfil do artista.
 
+Em `/conta/perfil`, o artista pode publicar ou remover um link direto para seu perfil no Ko-fi. O botão de apoio no perfil público abre o provedor em uma nova aba.
+
 Uma sessão de Moderador ou Admin abre `/moderacao` após o login. O painel tem filas de ilustrações pendentes e denúncias, além da aba de obras aprovadas visíveis na galeria. As ações de revisão exigem justificativa e usam as permissões da API.
 
 ## Imagens de desenvolvimento
