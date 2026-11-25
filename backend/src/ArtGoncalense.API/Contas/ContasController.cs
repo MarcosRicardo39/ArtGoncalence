@@ -34,6 +34,11 @@ public sealed class ContasController(IServicoContas contas) : ControllerBase
     [HttpPost("registrar")]
     public async Task<IActionResult> Registrar(RegistroConta dados, CancellationToken cancellationToken)
     {
+        if (!dados.MaiorDeIdade)
+        {
+            return Problem(statusCode: 400, title: "O cadastro exige a declaração de ter 18 anos ou mais.");
+        }
+
         if (!contas.EnvioDisponivel)
         {
             return CorreioIndisponivel();
@@ -135,7 +140,8 @@ public sealed record LoginConta(
 public sealed record RegistroConta(
     [Required, EmailAddress, MaxLength(256)] string Email,
     [Required, StringLength(AcessoConta.SenhaMaxima, MinimumLength = AcessoConta.SenhaMinima)] string Senha,
-    [Required, MaxLength(200)] string NomePublico);
+    [Required, MaxLength(200)] string NomePublico,
+    bool MaiorDeIdade);
 
 public sealed record CodigoConta(
     [Required, EmailAddress, MaxLength(256)] string Email,

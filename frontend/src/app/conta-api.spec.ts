@@ -69,6 +69,11 @@ describe('Conta e perfil', () => {
     harness.detectChanges();
     expect(tela.querySelector('#email-erro')?.textContent).toContain('Informe um e-mail válido.');
     expect(tela.querySelector('#senha-erro')?.textContent).toContain('15 a 128 caracteres');
+    const maiorDeIdade = tela.querySelector<HTMLInputElement>('#maior-de-idade');
+    expect(maiorDeIdade?.checked).toBe(false);
+    expect(tela.querySelector('#maior-de-idade-erro')?.textContent).toContain(
+      'Confirme a declaração',
+    );
     http.expectNone('/api/contas/csrf');
   });
 

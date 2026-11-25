@@ -28,15 +28,15 @@ public sealed partial class ApiTests
         using var aplicacao = new Aplicacao();
         using var cliente = await aplicacao.CriarClienteAsync();
         var email = $"{Guid.NewGuid():N}@example.test";
-        var cadastro = new { email, senha = Senha, nomePublico = "Artista de teste" };
+        var cadastro = new { email, senha = Senha, nomePublico = "Artista de teste", maiorDeIdade = true };
 
         Assert.Equal(HttpStatusCode.BadRequest, (await cliente.PostAsJsonAsync("/api/contas/registrar", cadastro)).StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, (await cliente.GetAsync("/api/contas/sessao")).StatusCode);
         await ObterCsrfAsync(cliente);
         Assert.Equal(HttpStatusCode.BadRequest,
-            (await PostAsync(cliente, "registrar", new { email, senha = "curta", cadastro.nomePublico })).StatusCode);
+            (await PostAsync(cliente, "registrar", new { email, senha = "curta", cadastro.nomePublico, cadastro.maiorDeIdade })).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest,
-            (await PostAsync(cliente, "registrar", new { email = "invalido", senha = Senha, cadastro.nomePublico })).StatusCode);
+            (await PostAsync(cliente, "registrar", new { email = "invalido", senha = Senha, cadastro.nomePublico, cadastro.maiorDeIdade })).StatusCode);
 
         var novo = await PostAsync(cliente, "registrar", cadastro);
         var repetido = await PostAsync(cliente, "registrar", cadastro with { email = email.ToUpperInvariant() });
@@ -92,7 +92,7 @@ public sealed partial class ApiTests
         await ObterCsrfAsync(cliente);
         var email = $"{Guid.NewGuid():N}@example.test";
         Assert.Equal(HttpStatusCode.Accepted,
-            (await PostAsync(cliente, "registrar", new { email, senha = Senha, nomePublico = "Artista" })).StatusCode);
+            (await PostAsync(cliente, "registrar", new { email, senha = Senha, nomePublico = "Artista", maiorDeIdade = true })).StatusCode);
 
         var ausente = await PostAsync(cliente, "login", new { email = "ausente@example.test", senha = Senha });
         Assert.Equal(HttpStatusCode.Unauthorized, ausente.StatusCode);
@@ -179,12 +179,35 @@ public sealed partial class ApiTests
         Assert.Equal(HttpStatusCode.NotFound, (await visitante.GetAsync($"/api/artistas/{suspenso.Id}")).StatusCode);
     }
 
+    [PostgreSqlFact]
+    public async Task CadastroExigeDeclaracaoDeMaioridade()
+    {
+        using var aplicacao = new Aplicacao();
+        using var cliente = await aplicacao.CriarClienteAsync();
+        await ObterCsrfAsync(cliente);
+        var email = $"{Guid.NewGuid():N}@example.test";
+        var dados = new { email, senha = Senha, nomePublico = "Artista" };
+        using var ausente = await PostAsync(cliente, "registrar", dados);
+        using var negativa = await PostAsync(cliente, "registrar",
+            new { dados.email, dados.senha, dados.nomePublico, maiorDeIdade = false });
+        Assert.Equal(HttpStatusCode.BadRequest, ausente.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, negativa.StatusCode);
+        Assert.Empty(aplicacao.Mensagens("confirmacao"));
+        await using var scope = aplicacao.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<ArtGoncalenseDbContext>();
+        Assert.False(await db.Usuarios.AnyAsync(x => x.Email == email));
+        using var aceita = await PostAsync(cliente, "registrar",
+            new { dados.email, dados.senha, dados.nomePublico, maiorDeIdade = true });
+        Assert.Equal(HttpStatusCode.Accepted, aceita.StatusCode);
+        Assert.Single(aplicacao.Mensagens("confirmacao"));
+    }
+
     private static async Task<Guid> CadastrarArtistaAsync(HttpClient cliente, string nomePublico)
     {
         await ObterCsrfAsync(cliente);
         var email = $"{Guid.NewGuid():N}@example.test";
         Assert.Equal(HttpStatusCode.Accepted,
-            (await PostAsync(cliente, "registrar", new { email, senha = Senha, nomePublico })).StatusCode);
+            (await PostAsync(cliente, "registrar", new { email, senha = Senha, nomePublico, maiorDeIdade = true })).StatusCode);
         Assert.Equal(HttpStatusCode.OK,
             (await PostAsync(cliente, "login", new { email, senha = Senha })).StatusCode);
         await ObterCsrfAsync(cliente);

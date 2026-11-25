@@ -4,7 +4,7 @@
 Base: [requirements.md](requirements.md) e [architecture.md](architecture.md). As rotas de contas, perfis, criação e consulta pública de ilustrações, moderação e denúncias estão implementadas. As demais seguem propostas. JSON em português e erros no formato Problem Details. O provedor de e-mail para ambiente público depende da DA-05.
 
 ## 2. Fluxo de cadastro
-1. Visitante informa e-mail, senha e nome público.
+1. Visitante informa e-mail, senha e nome público e declara ter 18 anos ou mais. A API rejeita cadastro sem a declaração afirmativa.
 2. API valida formato, unicidade e política de senha.
 3. Para e-mail novo, a conta é criada com confirmação pendente. Solicitações válidas recebem o mesmo 202 e corpo genérico, inclusive para e-mail já cadastrado.
 4. Após confirmação, artista pode publicar; antes disso, acesso a publicação é negado.

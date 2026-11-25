@@ -133,6 +133,32 @@
           </div>
         }
 
+        @if (pedeNome) {
+          <div class="campo">
+            <label class="declaracao-idade" for="maior-de-idade">
+              <input
+                id="maior-de-idade"
+                type="checkbox"
+                formControlName="maiorDeIdade"
+                aria-describedby="maior-de-idade-erro"
+                required
+                [attr.aria-invalid]="
+                  formulario.controls.maiorDeIdade.touched &&
+                  formulario.controls.maiorDeIdade.invalid
+                "
+              />
+              Declaro que tenho 18 anos ou mais.
+            </label>
+            <span id="maior-de-idade-erro" class="campo-erro">
+              @if (
+                formulario.controls.maiorDeIdade.touched && formulario.controls.maiorDeIdade.invalid
+              ) {
+                Confirme a declaração para criar a conta.
+              }
+            </span>
+          </div>
+        }
+
         @if (erro()) {
           <p class="mensagem erro" role="alert">{{ erro() }}</p>
         }

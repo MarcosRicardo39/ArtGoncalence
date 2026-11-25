@@ -54,6 +54,10 @@ export class Acesso {
   readonly aviso = signal('');
 
   readonly formulario = new FormGroup({
+    maiorDeIdade: new FormControl(false, {
+      nonNullable: true,
+      validators: this.pedeNome ? [Validators.requiredTrue] : [],
+    }),
     email: new FormControl(this.api.emailInformado, {
       nonNullable: true,
       validators: [Validators.required, Validators.email, Validators.maxLength(256)],
@@ -95,7 +99,7 @@ export class Acesso {
     this.erro.set('');
     this.aviso.set('');
     this.operando.set(true);
-    const { email, senha, codigo, nomePublico } = this.formulario.getRawValue();
+    const { email, senha, codigo, nomePublico, maiorDeIdade } = this.formulario.getRawValue();
     this.api.emailInformado = email.trim();
     const endereco = this.api.emailInformado;
     try {
@@ -109,8 +113,10 @@ export class Acesso {
             email: endereco,
             senha,
             nomePublico: nomePublico.trim(),
+            maiorDeIdade,
           });
           this.formulario.controls.senha.reset();
+          this.formulario.controls.maiorDeIdade.reset();
           this.aviso.set('Se aplicável, enviaremos instruções de confirmação para esse e-mail.');
           break;
         case 'confirmar':

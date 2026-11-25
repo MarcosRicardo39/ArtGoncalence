@@ -129,7 +129,7 @@ public sealed partial class ApiTests
     {
         await ObterCsrfAsync(cliente);
         var email = $"{Guid.NewGuid():N}@example.test";
-        using var cadastro = await PostAsync(cliente, "registrar", new { email, senha = Senha, nomePublico = "Artista" });
+        using var cadastro = await PostAsync(cliente, "registrar", new { email, senha = Senha, nomePublico = "Artista", maiorDeIdade = true });
         Assert.Equal(HttpStatusCode.Accepted, cadastro.StatusCode);
         using var login = await PostAsync(cliente, "login", new { email, senha = Senha });
         Assert.Equal(HttpStatusCode.OK, login.StatusCode);

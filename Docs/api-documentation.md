@@ -17,7 +17,7 @@ Obtenha os cookies com `GET /api/contas/csrf` e envie o valor do cookie legível
 
 | Operação em `/api/contas` | Campos JSON |
 |---|---|
-| `registrar` | `email`, `senha`, `nomePublico` |
+| `registrar` | `email`, `senha`, `nomePublico`, `maiorDeIdade` (`true` obrigatório) |
 | `login` | `email`, `senha` |
 | `confirmar-email` | `email`, `codigo` |
 | `reenviar-confirmacao` | `email` |
